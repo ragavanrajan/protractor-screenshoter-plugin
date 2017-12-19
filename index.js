@@ -440,7 +440,7 @@ protractorUtil.prototype.setup = function() {
         verbose: 'info',
         screenshotOnSpec: 'failure+success',
         pauseOn: 'never',
-        imageToAscii: 'failure',
+        imageToAscii: 'none',
         imageToAsciiOpts: {
             bg: true
         },

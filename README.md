@@ -83,7 +83,7 @@ exports.config = {
        writeReportFreq: {String}      (Default - 'end', 'spec', 'asap'),
        verbose: {String} (Default - 'info', 'debug'),
        pauseOn: {String}    (Default - 'never', 'failure', 'spec'),
-       imageToAscii: {String}    (Default - 'failure+success', 'failure', 'none'),
+       imageToAscii: {String}    (Default - 'none', 'failure+success', 'failure'),
        imageToAsciiOpts:{Obbject} (Default - {bg:true})
        clearFoldersBeforeTest: {Boolean}       (Default - false),
        failTestOnErrorLog: {
@@ -113,7 +113,7 @@ exports.config = {
         screenshotOnSpec: 'none',
         withLogs: 'true',
         writeReportFreq: 'asap',
-        imageToAscii: 'failure',
+        imageToAscii: 'none',
         clearFoldersBeforeTest: true
     }],
 
@@ -241,6 +241,11 @@ Then this browser instance will be not generated in the log file.
 Default: 'failure' Valid Options: 'failure+success'/'failure'/'none'
 
 To use this feature please follow instructions on <https://github.com/IonicaBizau/image-to-ascii/blob/master/INSTALLATION.md>
+
+and also please install the optional dependency
+```
+npm install image-to-ascii
+````
 
 ## imageToAsciiOpts
 
