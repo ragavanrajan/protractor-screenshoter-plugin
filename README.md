@@ -371,6 +371,18 @@ Then you can tweak your jasmine test to check the correct behavior of your scree
   2. `npm run setup` This will install webdriver
   3. `npm run server &` This will run selenium server
 
+### How to debug screenshoter plugin
+
+You can debug this plugin by running protractor in a debug mode like this:
+```
+ node --inspect-brk node_modules/protractor/bin/protractor ./spec/integrational/protractor-config/default.js
+```
+**NOTE**
+  Where `./spec/integrational/protractor-config/default.js` is a sample e2e test. You can choose another one or write one yourself.
+
+Then open ``chrome://inspect`` in your Chrome and press `inspect` on the remote target.
+
+Here is more information how to debug protractor - https://github.com/angular/protractor/blob/master/docs/debugging.md
 
 ### Releasing
 
