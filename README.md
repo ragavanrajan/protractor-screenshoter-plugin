@@ -1,4 +1,4 @@
-[[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/protractor-screenshoter-plugin/Lobby)
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/protractor-screenshoter-plugin/Lobby)
 
 [![npm](https://img.shields.io/npm/dm/protractor-screenshoter-plugin.svg?style=flat-square)](https://www.npmjs.com/package/protractor-screenshoter-plugin) [![npm](https://img.shields.io/npm/dt/protractor-screenshoter-plugin.svg?style=flat-square)](https://www.npmjs.com/package/protractor-screenshoter-plugin)
 
@@ -312,17 +312,7 @@ After cloning the project you can run tests as follows:
 3. `npm run server &`
 4. `npm test`
 
-  This includes also a coverage report to turn it off do this:
-
-  1. comment/uncomment the following line in the `screenshoter.int.spec.js`
-  ```js
-  // use to run with coverage report,
-  // to see the overall coverage run istanbul report
-  // var command = 'istanbul cover --print none --report lcovonly --dir coverage/'+configName +' node_modules/protractor/bin/protractor ./spec/integrational/protractor-config/' + configName;
-  // use to run without coverage report
-  var command = 'protractor ./spec/integrational/protractor-config/' + configName;
-  ```
-  2. run ``jasmine``
+To run without coverage report including some debug logging use  `npm run testing`
 
 
 ## Committing

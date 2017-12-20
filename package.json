@@ -7,6 +7,7 @@
     "setup": "webdriver-manager update",
     "server": "webdriver-manager start",
     "test": "istanbul cover node_modules/jasmine/bin/jasmine.js && istanbul report",
+    "testing": "TEST_COVERAGE_SKIP=true TEST_DEBUG=true node_modules/jasmine/bin/jasmine.js",
     "release": "standard-version"
   },
   "repository": {
