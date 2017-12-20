@@ -257,11 +257,11 @@ protractorUtil.joinReports = function(context, done) {
   });
 
   var ci = {
-    build: process.env.CIRCLE_BUILD_NUM || 'N/A',
-    branch: process.env.CIRCLE_BRANCH || 'N/A',
-    sha: process.env.CIRCLE_SHA1 || 'N/A',
-    tag: process.env.CIRCLE_TAG || 'N/A',
-    name: process.env.CIRCLE_PROJECT_REPONAME || 'N/A'
+    build: process.env.CI_JOB_ID || process.env.CIRCLE_BUILD_NUM || 'N/A',
+    branch: process.env.CI_COMMIT_REF_NAME || process.env.CIRCLE_BRANCH || 'N/A',
+    sha: process.env.CI_COMMIT_SHA || process.env.CIRCLE_SHA1 || 'N/A',
+    tag: process.env.CI_COMMIT_TAG || process.env.CIRCLE_TAG || 'N/A',
+    name: process.env.CI_PROJECT_PATH || process.env.CIRCLE_PROJECT_REPONAME || 'N/A'
   };
 
   var data = {
