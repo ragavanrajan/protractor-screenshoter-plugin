@@ -7,6 +7,8 @@
 [![Dependency Status](https://david-dm.org/azachar/protractor-screenshoter-plugin.svg)](https://david-dm.org/azachar/protractor-screenshoter-plugin) [![devDependency Status](https://david-dm.org/azachar/protractor-screenshoter-plugin/dev-status.svg)](https://david-dm.org/azachar/protractor-screenshoter-plugin#info=devDependencies)
 
 [![Build Status](https://travis-ci.org/azachar/protractor-screenshoter-plugin.svg?branch=master)](https://travis-ci.org/azachar/protractor-screenshoter-plugin)
+[![Coverage Status](https://img.shields.io/codecov/c/github/azachar/protractor-screenshoter-plugin.svg?style=flat-square)](http://codecov.io/github/azachar/protractor-screenshoter-plugin?branch=master)
+
 
 # protractor-screenshoter-plugin
 
@@ -309,6 +311,19 @@ After cloning the project you can run tests as follows:
 2. `npm run setup`
 3. `npm run server &`
 4. `npm test`
+
+  This includes also a coverage report to turn it off do this:
+
+  1. comment/uncomment the following line in the `screenshoter.int.spec.js`
+  ```js
+  // use to run with coverage report,
+  // to see the overall coverage run istanbul report
+  // var command = 'istanbul cover --print none --report lcovonly --dir coverage/'+configName +' node_modules/protractor/bin/protractor ./spec/integrational/protractor-config/' + configName;
+  // use to run without coverage report
+  var command = 'protractor ./spec/integrational/protractor-config/' + configName;
+  ```
+  2. run ``jasmine``
+
 
 ## Committing
 

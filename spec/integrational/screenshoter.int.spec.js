@@ -5,7 +5,11 @@ var fs = require('fs-extra');
 var cp = require('child_process');
 
 function runProtractorWithConfig(configName) {
-    var command = 'protractor ./spec/integrational/protractor-config/' + configName;
+    // use to run with coverage report,
+    // to see the overall coverage run istanbul report
+    var command = 'istanbul cover --print none --report lcovonly --dir coverage/'+configName +' node_modules/protractor/bin/protractor ./spec/integrational/protractor-config/' + configName;
+    // use to run without coverage report
+    // var command = 'protractor ./spec/integrational/protractor-config/' + configName;
     console.info('Running command ' + command);
     try {
         cp.execSync(command, {
