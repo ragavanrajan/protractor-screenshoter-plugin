@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.5.0"></a>
+# [0.5.0](https://github.com/azachar/protractor-screenshoter-plugin/compare/v0.4.1...v0.5.0) (2017-12-20)
+
+
+### Bug Fixes
+
+* **plugin:** do not make screenshots for pending or skipped resutls ([7e081af](https://github.com/azachar/protractor-screenshoter-plugin/commit/7e081af)), closes [#55](https://github.com/azachar/protractor-screenshoter-plugin/issues/55)
+
+
+### Features
+
+* **report:** GitLab Support ([399b4a5](https://github.com/azachar/protractor-screenshoter-plugin/commit/399b4a5))
+
+
+
 <a name="0.4.1"></a>
 ## [0.4.1](https://github.com/azachar/protractor-screenshoter-plugin/compare/v0.4.0...v0.4.1) (2017-12-20)
 
