@@ -199,6 +199,9 @@ protractorUtil.takeScreenshotOnSpecDone = function(result, context, test) {
   } else {
     makeScreenshotsFromEachBrowsers = context.config.screenshotOnSpec === 'failure+success' || context.config.screenshotOnSpec === 'failure';
   }
+  if (result.status === 'disabled' || result.status === 'pending') {
+    makeScreenshotsFromEachBrowsers = false;
+  }
   if (makeScreenshotsFromEachBrowsers) {
     protractorUtil.takeScreenshot(context, function(file, browserName, finalFile, browserInstance, done) {
       test.specScreenshots.push({

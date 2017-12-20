@@ -905,4 +905,9 @@ describe("Screenshoter running under protractor", function() {
         });
     });
 
+  describe("bug #55", function() {
+    it("should run without errors", function() {
+      expect(runProtractorWithConfig('bug55.js')).toBeTruthy();
+    });
+  });
 });
