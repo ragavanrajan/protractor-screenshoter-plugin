@@ -14,7 +14,7 @@ before_install:
  - sudo apt-get install graphicsmagick
 before_script:
   - npm run setup
-  - nohup bash -c "npm run server 2>&1 &"
+  - nohup bash -c "npm run server &> selenium-server.log &"
   - sleep 10
 deploy:
   provider: npm
