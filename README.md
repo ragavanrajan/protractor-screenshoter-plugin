@@ -14,14 +14,19 @@
 
 This plugin captures for each **expectation** or **spec** console **logs** and makes **screenshots** for **each browser** instance. Also it comes with a beautifull angular based [HTML reporter for chat alike apps](https://github.com/azachar/screenshoter-report-analyzer).
 
-1. This plugin can take screenshots for each Jasmine2 expect success/failure on _multiple-browsers instances_ at once.
-2. It can take screenshots for each spec failure/success as well
+1. This plugin can take screenshots of each Jasmine2 expect success/failure on _multiple-browsers instances_ at once.
+2. It can take screenshots of each spec failure/success as well
 3. For each expectation or spec can capture console logs for each browser instance
-4. It can generate a report analyzer - angular+bootstrap HTML reports with active filtering to easy find out why your tests are failing
+4. It can generate a report analyzer - angular+bootstrap HTML reports with active filtering to easily find out why your tests are failing
 5. HTML reports allow you to analyze your browser's console logs as well.
-6. Supports circleci.com (the report displays a build number, a branch, etc. )
+6. Supports gitlab.com CI/CD, circleci.com (the report displays a build number, a branch, etc. )
 7. Supports parallel tests execution
 8. Makes optional Ascii screenshots
+
+Additional HTML reporter features:
+
+1. domain log filter (to narrow down your test classes faster)
+2. excludes certain repetitive logs
 
 
 ## Screenshots
@@ -41,6 +46,10 @@ This plugin captures for each **expectation** or **spec** console **logs** and m
 ### Console log management
 
 ![Screenshoter reporter console](https://cdn.rawgit.com/azachar/screenshoter-report-analyzer/master/screenshots/screenshot3.png)
+
+####  Stacktrace filtering
+![Screenshoter reporter stacktrace filtering](https://cdn.rawgit.com/azachar/screenshoter-report-analyzer/master/screenshots/screenshot5.png)
+
 
 ## Motivation
 
@@ -62,16 +71,72 @@ Also, I created a list of [alternatives](https://github.com/azachar/protractor-s
 npm install protractor-screenshoter-plugin
 ```
 
-NOTE: This plugin depends on [screenshoter-report-analyzer](https://github.com/azachar/screenshoter-report-analyzer). So sometimes even if this plugin version is not updated, the reporter might be.
+**NOTE**:
+
+1. This plugin depends on [screenshoter-report-analyzer](https://github.com/azachar/screenshoter-report-analyzer). So sometimes even if this plugin version is not updated, the reporter might be.
+
+2. If you want to use the option `imageToAscii`, then you need to install additional dependencies depending on your OS. By default is this option turned off.
+```sh
+  # Ubuntu
+  sudo apt-get install graphicsmagick
+
+  # Fedora
+  sudo dnf install GraphicsMagick
+
+  # CentOS / RHEL
+  sudo yum install --enablerepo epel GraphicsMagick
+
+  # OS X
+  brew install graphicsmagick
+
+  # Windows users can install the binaries from http://www.graphicsmagick.org/
+  # ...or using the command line:
+  # Chocolatey (package manager for Windows)
+  # (Restart of cmd/PowerShell is required)
+  choco install graphicsmagick
+```
+
+  Then, install this package
+```sh
+  npm install image-to-ascii
+```
 
 # Experimental features
 
-Please always check our branches started with `feat-`. There are some new and shiny features that are working but aren't yet published. Each branch has information how to use it and install it. Once it is stable enough, it will be merged to the master branch.
+Please always check our branches started with `feat-`. There are some new and shiny features that are working but aren't yet published. Each branch has information how to use it and install it. Once it is stable enough, it will be merged into the master branch.
 Feel free to provide feedback to them.
 
 # Usage
 
 Add this plugin to the protractor config file:
+
+Example:
+
+```javascript
+exports.config = {
+    framework: 'jasmine2',
+
+    plugins: [{
+        package: 'protractor-screenshoter-plugin',
+        screenshotPath: './REPORTS/e2e',
+        screenshotOnExpect: 'failure+success',
+        screenshotOnSpec: 'none',
+        withLogs: 'true',
+        writeReportFreq: 'asap',
+        imageToAscii: 'none',
+        clearFoldersBeforeTest: true
+      }],
+
+      onPrepare: function() {
+          // returning the promise makes protractor wait for the reporter config before executing tests
+          return global.browser.getProcessedConfig().then(function(config) {
+              //it is ok to be empty
+          });
+      }
+};
+```
+
+Here is the full list of possible options, more details see below in the [config reference](#config-reference) section.
 
 ```javascript
 exports.config = {
@@ -102,31 +167,6 @@ exports.config = {
      };
 ```
 
-Example:
-
-```javascript
-exports.config = {
-    framework: 'jasmine2',
-
-    plugins: [{
-        package: 'protractor-screenshoter-plugin',
-        screenshotPath: './REPORTS/e2e',
-        screenshotOnExpect: 'failure+success',
-        screenshotOnSpec: 'none',
-        withLogs: 'true',
-        writeReportFreq: 'asap',
-        imageToAscii: 'none',
-        clearFoldersBeforeTest: true
-    }],
-
-    onPrepare: function() {
-        // returning the promise makes protractor wait for the reporter config before executing tests
-        return global.browser.getProcessedConfig().then(function(config) {
-            //it is ok to be empty
-        });
-    }
-};
-```
 
 ## Single browser app
 
@@ -267,7 +307,7 @@ In order to make chrome' console works properly, you need to modify your `protra
 
 ## writeReportFreq
 
-By default, the output JSON file with tests results is written at the end of the execution of jasmine tests. However for debug process is better to get it immediately after each expectation - specify the option 'asap'. Also, there is a less usual option to write it after each test - use the option 'spec'. The recommended is to left it out for a CI server and for a local debugging use the option 'asap'.
+By default, the output JSON file with tests results is written at the end of the execution of jasmine tests. However, for debug, process is better to get it immediately after each expectation - specify the option 'asap'. Also, there is a less usual option to write it after each test - use the option 'spec'. The recommended is to left it out for a CI server and for a local debugging use the option 'asap'.
 
 Default: 'end' Valid Options: 'asap', 'spec', 'end'
 
@@ -293,13 +333,13 @@ _NOTE: This works only on chrome!_
 
 ### failTestOnErrorLogLevel
 
-Log level, test fails of the browser console log has logs **more than** this specified level.
+Log level, the test fails of the browser console log has logs **more than** this specified level.
 
 Default: 900
 
 ### excludeKeywords
 
-An array of keywords to be excluded, while searching for error logs. i.e If a log contains any of these keywords, spec/test will not be marked failed.
+An array of keywords to be excluded while searching for error logs. i.e If a log contains any of these keywords, spec/test will not be marked failed.
 
 Please do not specify this flag, if you don't supply any such keywords.
 
