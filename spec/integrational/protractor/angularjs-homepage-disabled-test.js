@@ -1,6 +1,8 @@
 /*The MIT License, Copyright (c) 2010-2016 Google, Inc.*/
 
 describe('angularjs homepage', function() {
+  describe('empty describe', function() {});
+
   it('should greet the named user', function() {
     browser.get('http://www.angularjs.org');
 
@@ -11,7 +13,17 @@ describe('angularjs homepage', function() {
     expect(greeting.getText()).toEqual('Hello Julie!');
   });
 
-  describe('todo list', function() {
+  xit('should not greet the named user', function() {
+    browser.get('http://www.angularjs.org');
+
+    element(by.model('yourName')).sendKeys('Julie');
+
+    var greeting = element(by.binding('yourName'));
+
+    expect(greeting.getText()).toEqual('Hello Julie!');
+  });
+
+  xdescribe('todo list', function() {
     var todoList;
 
     beforeEach(function() {
