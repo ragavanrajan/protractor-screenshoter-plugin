@@ -9,7 +9,7 @@ exports.config = {
         screenshotPath: '.tmp/readme',
         screenshotOnExpect: 'failure+success',
         screenshotOnSpec: 'none',
-        withLogs: 'true',
+        withLogs: true,
         writeReportFreq: 'asap',
         clearFoldersBeforeTest: true
     }],

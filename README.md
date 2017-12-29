@@ -121,7 +121,7 @@ exports.config = {
         screenshotPath: './REPORTS/e2e',
         screenshotOnExpect: 'failure+success',
         screenshotOnSpec: 'none',
-        withLogs: 'true',
+        withLogs: true,
         writeReportFreq: 'asap',
         imageToAscii: 'none',
         clearFoldersBeforeTest: true
@@ -215,7 +215,7 @@ exports.config = {
         screenshotPath: './REPORTS/e2e',
         screenshotOnExpect: 'failure+success',
         screenshotOnSpec: 'none',
-        withLogs: 'true',
+        withLogs: true,
         writeReportFreq: 'asap',
         clearFoldersBeforeTest: true
     }],
