@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.6.0"></a>
+# [0.6.0](https://github.com/azachar/protractor-screenshoter-plugin/compare/v0.5.0...v0.6.0) (2017-12-29)
+
+
+### Features
+
+* **failTestOnErrorLog:** Add `suites` parameter ([688a069](https://github.com/azachar/protractor-screenshoter-plugin/commit/688a069)), closes [#49](https://github.com/azachar/protractor-screenshoter-plugin/issues/49)
+
+
+
 <a name="0.5.0"></a>
 # [0.5.0](https://github.com/azachar/protractor-screenshoter-plugin/compare/v0.4.1...v0.5.0) (2017-12-20)
 
