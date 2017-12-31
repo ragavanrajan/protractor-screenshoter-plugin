@@ -67,9 +67,26 @@ Also, I created a list of [alternatives](https://github.com/azachar/protractor-s
 
 # How to install
 
+If your protractor is installed locally, then
+
 ```
 npm install protractor-screenshoter-plugin
 ```
+
+If your protractor is installed globally, then
+```
+npm install --global protractor-screenshoter-plugin
+```
+
+or install this plugin locally, but then you must specify the plugin's path like this:
+
+```
+    plugins: [{
+        package: 'node_modules/protractor-screenshoter-plugin/index.js',
+        ...
+    }],
+```
+as mentioned in #37.
 
 **NOTE**:
 
