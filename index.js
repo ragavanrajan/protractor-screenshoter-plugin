@@ -44,6 +44,7 @@ try { // optional dependency, ignore if not installed
  *      failTestOnErrorLog: {
  *               failTestOnErrorLogLevel: {Number},  (Default - 900)
  *               excludeKeywords: {A JSON Array}
+ *               suites: {A JSON Array}
  *          }
  *       }]
  *    };
@@ -57,17 +58,25 @@ protractorUtil.logInfo = console.info;
 protractorUtil.logError = console.error;
 
 protractorUtil.forEachBrowser = function(action) {
+  function catchError(err) {
+    console.warn('Unknown error:');
+    console.warn(err);
+  }
+
   try {
     if (global.screenshotBrowsers && Object.keys(global.screenshotBrowsers).length > 0) {
       _.forOwn(global.screenshotBrowsers, function(instance, name) {
-        action(instance, name, protractorUtil.newLongRunningOperationCounter());
+        instance.getCapabilities().then(function(capabilities) {
+          action(instance, name + ' [' + capabilities.get('browserName') + ']', protractorUtil.newLongRunningOperationCounter());
+        }).catch(catchError);
       });
     } else {
-      action(global.browser, 'default', protractorUtil.newLongRunningOperationCounter());
+      global.browser.getCapabilities().then(function(capabilities) {
+        action(global.browser, capabilities.get('browserName'), protractorUtil.newLongRunningOperationCounter());
+      }).catch(catchError);
     }
   } catch (err) {
-    console.warn('Unknown error:');
-    console.warn(err);
+    catchError(err);
   }
 };
 
@@ -157,9 +166,6 @@ protractorUtil.takeScreenshotOnExpectDone = function(context) {
         });
         if (makeAsciiLog && !browserInstance.skipImageToAscii) {
           try {
-            if (!imageToAscii) {
-              throw new Error('image-to-ascii is not installed');
-            }
             imageToAscii(finalFile, context.config.imageToAsciiOpts, function(err, converted) {
               var asciImage;
               asciImage += '\n\n============================\n';
@@ -328,7 +334,8 @@ protractorUtil.installReporter = function(context) {
 };
 
 protractorUtil.registerJasmineReporter = function(context) {
-  var saySuite, lastResultsToSay;
+  var saySuite;
+  var lastResultsToSay;
   jasmine.getEnv().addReporter({
     jasmineStarted: function() {
       global.screenshotBrowsers = {};
@@ -339,12 +346,11 @@ protractorUtil.registerJasmineReporter = function(context) {
         protractorUtil.installReporter(context);
       }
     },
-    suiteStarted: function(result) {
+    suiteStarted: function() {
       if (context.config.speak) {
         saySuite = true;
       }
     },
-
     specStarted: function(result) {
       protractorUtil.test = {
         start: moment(),
@@ -394,7 +400,7 @@ protractorUtil.registerJasmineReporter = function(context) {
       }
 
       var passed = result.failedExpectations.length === 0;
-      if (!passed && context.config.pauseOn === 'failure') {
+      if (!passed && context.config.pauseOn === 'spec') {
         protractorUtil.logInfo('Pause browser because of a spec failed  - %s', result.name);
         protractorUtil.logDebug(result.failedExpectations[0].message);
         protractorUtil.logDebug(result.failedExpectations[0].stack);
@@ -407,7 +413,7 @@ protractorUtil.registerJasmineReporter = function(context) {
     jasmineDone: function() {
       if (context.config.speak) {
         say.stop(); //kill all others
-        if (lastResultsToSay) {;
+        if (lastResultsToSay) {
           console.log('Speaking %s', lastResultsToSay);
           say.speak(lastResultsToSay);
         }
@@ -423,7 +429,7 @@ protractorUtil.registerJasmineReporter = function(context) {
  * @return {!webdriver.promise.Promise.<R>} A promise
  */
 protractorUtil.failTestOnErrorLog = function(context) {
-  return global.browser.getProcessedConfig().then(function(config) {
+  return global.browser.getProcessedConfig().then(function() {
     beforeEach(function() {
       /*
        * A Jasmine custom matcher
@@ -447,6 +453,19 @@ protractorUtil.failTestOnErrorLog = function(context) {
     });
 
     afterEach(function() {
+
+      /*
+       * Verifies if the `suite` where tests are running is present on the `failTestOnErrorLog.suites` list
+       */
+      function isASuiteToCheck() {
+        //If there are no suites defined the default value is 'ALL'
+        if (!context.config.failTestOnErrorLog.suites) {
+          return true;
+        }
+
+        return (context.config.failTestOnErrorLog.suites.indexOf(browser.getProcessedConfig().value_.suite) > -1);
+      }
+
       /*
        * Verifies that console has no error logs, if error log is there test is marked as failure
        */
@@ -457,7 +476,7 @@ protractorUtil.failTestOnErrorLog = function(context) {
           browserLogs.forEach(function(log) {
             var logLevel = context.config.failTestOnErrorLog.failTestOnErrorLogLevel ? context.config.failTestOnErrorLog.failTestOnErrorLogLevel : 900;
             var flag = false;
-            if (log.level.value > logLevel) { // it's an error log
+            if ((log.level.value > logLevel) && isASuiteToCheck()) { // it's an error log && is a valid suite
               if (context.config.failTestOnErrorLog.excludeKeywords) {
                 context.config.failTestOnErrorLog.excludeKeywords.forEach(function(keyword) {
                   if (log.message.search(keyword) > -1) {
@@ -532,7 +551,7 @@ protractorUtil.prototype.setup = function() {
 
 
   var pjson = require(__dirname + '/package.json');
-  protractorUtil.logInfo('Activated Protractor Screenshoter Plugin, ver. ' + pjson.version + ' (c) 2017 ' + pjson.author + ' and contributors');
+  protractorUtil.logInfo('Activated Protractor Screenshoter Plugin, ver. ' + pjson.version + ' (c) 2016 - ' + new Date().getFullYear() + ' ' + pjson.author + ' and contributors');
   protractorUtil.logDebug('The resolved configuration is:');
   protractorUtil.logDebug(this.config);
 };
@@ -563,7 +582,7 @@ protractorUtil.newLongRunningOperationCounter = function() {
   protractorUtil.runningOperations++;
   // protractorUtil.logDebug('Open operations ', protractorUtil.runningOperations);
 
-  return function(err, result) {
+  return function() {
     protractorUtil.runningOperations--;
     // protractorUtil.logDebug('Remaining operations ', protractorUtil.runningOperations);
   }
@@ -574,7 +593,7 @@ protractorUtil.prototype.teardown = function() {
   var self = this;
 
   function finish() {
-    protractorUtil.writeReport(self, function(err, result) {
+    protractorUtil.writeReport(self, function(err) {
       if (err) {
         protractorUtil.logDebug(err);
       }

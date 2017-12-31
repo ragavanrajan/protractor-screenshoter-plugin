@@ -1,16 +1,17 @@
 var env = require('./environment');
-var path = require('path');
 
 var fs = require('fs-extra');
 var cp = require('child_process');
 
-function runProtractorWithConfig(configName) {
-  var command;
+function runProtractorWithConfig(configName, params) {
+  var command = 'node_modules/protractor/bin/protractor ./spec/integrational/protractor-config/' + configName;
   if (env.coverage) {
-    command = 'istanbul cover --print none --report lcovonly --dir coverage/' + configName + ' node_modules/protractor/bin/protractor ./spec/integrational/protractor-config/' + configName;
-  } else {
-    command = 'node_modules/protractor/bin/protractor ./spec/integrational/protractor-config/' + configName;
+    command = 'nyc --reporter lcov ' + command;
   }
+  if (params) {
+    command += ' ' + params;
+  }
+
   console.info('Running command ' + command);
   try {
     cp.execSync(command, {
@@ -181,6 +182,68 @@ describe("Screenshoter running under protractor", function() {
         }
         expect(data).toContain('ui-view');
         expect(data).toContain('html');
+        done();
+      });
+    });
+
+  });
+
+  describe("default browser name is read from capabilities", function() {
+
+    beforeAll(function() {
+      runProtractorWithConfig('name.js');
+    });
+
+    it("should generate report.js with named browser", function(done) {
+      fs.readFile('.tmp/name/report.js', 'utf8', function(err, data) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(data).toContain("angular.module('reporter').constant('data'");
+
+        var report = getReportAsJson(data);
+        expect(report.stat.passed).toBe(3);
+        expect(report.tests.length).toBe(3);
+        expect(report.tests[0].specScreenshots[0].browser).toEqual(env.capabilities.browserName);
+        expect(report.tests[0].passedExpectations[0].screenshots[0].browser).toEqual(env.capabilities.browserName);
+
+        expect(report.tests[1].specScreenshots[0].browser).toEqual(env.capabilities.browserName);
+        expect(report.tests[1].passedExpectations[0].screenshots[0].browser).toEqual(env.capabilities.browserName);
+        expect(report.tests[1].passedExpectations[1].screenshots[0].browser).toEqual(env.capabilities.browserName);
+
+        expect(report.tests[2].specScreenshots[0].browser).toEqual(env.capabilities.browserName);
+        expect(report.tests[2].passedExpectations[0].screenshots[0].browser).toEqual(env.capabilities.browserName);
+
+        done();
+      });
+    });
+
+  });
+
+  describe("chrome browser name is read from multiCapabilities", function() {
+
+    beforeAll(function() {
+      runProtractorWithConfig('name-multi.js');
+    });
+
+    it("should generate report.js with different browser names", function(done) {
+      fs.readFile('.tmp/name-multi/report.js', 'utf8', function(err, data) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(data).toContain("angular.module('reporter').constant('data'");
+
+        var report = getReportAsJson(data);
+        expect(report.stat.passed).toBe(6);
+        expect(report.tests.length).toBe(6);
+
+        expect(report.tests[0].specScreenshots[0].browser).toEqual('chrome');
+        expect(report.tests[1].specScreenshots[0].browser).toEqual('chrome');
+        expect(report.tests[2].specScreenshots[0].browser).toEqual('chrome');
+
+        expect(report.tests[3].specScreenshots[0].browser).toEqual('firefox');
+        expect(report.tests[4].specScreenshots[0].browser).toEqual('firefox');
+        expect(report.tests[5].specScreenshots[0].browser).toEqual('firefox');
         done();
       });
     });
@@ -372,7 +435,7 @@ describe("Screenshoter running under protractor", function() {
     });
 
     it("should not install reporter", function(done) {
-      fs.readFile('.tmp/nohtml/index.html', 'utf8', function(err, data) {
+      fs.readFile('.tmp/nohtml/index.html', 'utf8', function(err) {
         if (err) {
           return done();
         }
@@ -438,6 +501,182 @@ describe("Screenshoter running under protractor", function() {
           return done.fail(err);
         }
         expect(items.length).toEqual(2);
+        done();
+      });
+    });
+  });
+
+  describe("failures with logs", function() {
+
+    beforeAll(function() {
+      runProtractorWithConfig('failuresWithLogs.js');
+    });
+
+    it("should generate report.js with logs", function(done) {
+      fs.readFile('.tmp/failuresWithLogs/report.js', 'utf8', function(err, data) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(data).toContain("angular.module('reporter').constant('data'");
+
+        var report = getReportAsJson(data);
+        expect(report.stat.passed).toBe(1);
+        expect(report.stat.failed).toBe(1);
+
+        expect(report.tests.length).toBe(2);
+        expect(report.tests[0].passedExpectations.length).toBe(0);
+        expect(report.tests[0].failedExpectations.length).toBe(1);
+        expect(report.tests[0].failedExpectations[0].logs[0].logs.length).toBe(5);
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[0].level).toBe('SEVERE');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[0].message).toContain('sample error 1');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[1].level).toBe('WARNING');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[1].message).toContain('sample warning 1');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[2].level).toBe('INFO');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[2].message).toContain('sample info 1');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[3].level).toBe('INFO');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[3].message).toContain('sample log same as info 1');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[4].level).toBe('DEBUG');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[4].message).toContain('sample debug 1');
+        expect(report.tests[0].failedExpectations[0].screenshots.length).toBe(1);
+        expect(report.tests[0].specLogs[0].logs.length).toBe(5);
+        expect(report.tests[0].specLogs[0].logs[0].level).toBe('SEVERE');
+        expect(report.tests[0].specLogs[0].logs[0].message).toContain('sample error 2');
+        expect(report.tests[0].specLogs[0].logs[1].level).toBe('WARNING');
+        expect(report.tests[0].specLogs[0].logs[1].message).toContain('sample warning 2');
+        expect(report.tests[0].specLogs[0].logs[2].level).toBe('INFO');
+        expect(report.tests[0].specLogs[0].logs[2].message).toContain('sample info 2');
+        expect(report.tests[0].specLogs[0].logs[3].level).toBe('INFO');
+        expect(report.tests[0].specLogs[0].logs[3].message).toContain('sample log same as info 2');
+        expect(report.tests[0].specLogs[0].logs[4].level).toBe('DEBUG');
+        expect(report.tests[0].specLogs[0].logs[4].message).toContain('sample debug 2');
+        expect(report.tests[0].specScreenshots.length).toBe(1);
+
+        expect(report.tests[1].failedExpectations.length).toBe(0);
+        expect(report.tests[1].passedExpectations.length).toBe(1);
+        expect(report.tests[1].passedExpectations[0].logs[0].logs.length).toBe(5);
+        expect(report.tests[1].passedExpectations[0].logs[0].logs.length).toBe(5);
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[0].level).toBe('SEVERE');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[0].message).toContain('sample error 3');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[1].level).toBe('WARNING');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[1].message).toContain('sample warning 3');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[2].level).toBe('INFO');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[2].message).toContain('sample info 3');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[3].level).toBe('INFO');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[3].message).toContain('sample log same as info 3');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[4].level).toBe('DEBUG');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[4].message).toContain('sample debug 3');
+        expect(report.tests[1].passedExpectations[0].screenshots.length).toBe(1);
+        expect(report.tests[1].specLogs[0].logs.length).toBe(5);
+        expect(report.tests[1].specLogs[0].logs[0].level).toBe('SEVERE');
+        expect(report.tests[1].specLogs[0].logs[0].message).toContain('sample error 4');
+        expect(report.tests[1].specLogs[0].logs[1].level).toBe('WARNING');
+        expect(report.tests[1].specLogs[0].logs[1].message).toContain('sample warning 4');
+        expect(report.tests[1].specLogs[0].logs[2].level).toBe('INFO');
+        expect(report.tests[1].specLogs[0].logs[2].message).toContain('sample info 4');
+        expect(report.tests[1].specLogs[0].logs[3].level).toBe('INFO');
+        expect(report.tests[1].specLogs[0].logs[3].message).toContain('sample log same as info 4');
+        expect(report.tests[1].specLogs[0].logs[4].level).toBe('DEBUG');
+        expect(report.tests[1].specLogs[0].logs[4].message).toContain('sample debug 4');
+        expect(report.tests[1].specScreenshots.length).toBe(1);
+
+        done();
+      });
+    });
+
+    it("should generate failure screenshots", function(done) {
+      fs.readdir('.tmp/failuresWithLogs/screenshots', function(err, items) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(items.length).toEqual(4);
+        done();
+      });
+    });
+  });
+
+  describe("failures with asap logs", function() {
+
+    beforeAll(function() {
+      runProtractorWithConfig('failuresWithLogsAsap.js');
+    });
+
+    it("should generate report.js with logs", function(done) {
+      fs.readFile('.tmp/failuresWithLogsAsap/report.js', 'utf8', function(err, data) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(data).toContain("angular.module('reporter').constant('data'");
+
+        var report = getReportAsJson(data);
+        expect(report.stat.passed).toBe(1);
+        expect(report.stat.failed).toBe(1);
+
+        expect(report.tests.length).toBe(2);
+        expect(report.tests[0].passedExpectations.length).toBe(0);
+        expect(report.tests[0].failedExpectations.length).toBe(1);
+        expect(report.tests[0].failedExpectations[0].logs[0].logs.length).toBe(5);
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[0].level).toBe('SEVERE');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[0].message).toContain('sample error 1');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[1].level).toBe('WARNING');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[1].message).toContain('sample warning 1');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[2].level).toBe('INFO');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[2].message).toContain('sample info 1');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[3].level).toBe('INFO');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[3].message).toContain('sample log same as info 1');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[4].level).toBe('DEBUG');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[4].message).toContain('sample debug 1');
+        expect(report.tests[0].failedExpectations[0].screenshots.length).toBe(1);
+        expect(report.tests[0].specLogs[0].logs.length).toBe(5);
+        expect(report.tests[0].specLogs[0].logs[0].level).toBe('SEVERE');
+        expect(report.tests[0].specLogs[0].logs[0].message).toContain('sample error 2');
+        expect(report.tests[0].specLogs[0].logs[1].level).toBe('WARNING');
+        expect(report.tests[0].specLogs[0].logs[1].message).toContain('sample warning 2');
+        expect(report.tests[0].specLogs[0].logs[2].level).toBe('INFO');
+        expect(report.tests[0].specLogs[0].logs[2].message).toContain('sample info 2');
+        expect(report.tests[0].specLogs[0].logs[3].level).toBe('INFO');
+        expect(report.tests[0].specLogs[0].logs[3].message).toContain('sample log same as info 2');
+        expect(report.tests[0].specLogs[0].logs[4].level).toBe('DEBUG');
+        expect(report.tests[0].specLogs[0].logs[4].message).toContain('sample debug 2');
+        expect(report.tests[0].specScreenshots.length).toBe(1);
+
+        expect(report.tests[1].failedExpectations.length).toBe(0);
+        expect(report.tests[1].passedExpectations.length).toBe(1);
+        expect(report.tests[1].passedExpectations[0].logs[0].logs.length).toBe(5);
+        expect(report.tests[1].passedExpectations[0].logs[0].logs.length).toBe(5);
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[0].level).toBe('SEVERE');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[0].message).toContain('sample error 3');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[1].level).toBe('WARNING');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[1].message).toContain('sample warning 3');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[2].level).toBe('INFO');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[2].message).toContain('sample info 3');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[3].level).toBe('INFO');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[3].message).toContain('sample log same as info 3');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[4].level).toBe('DEBUG');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[4].message).toContain('sample debug 3');
+        expect(report.tests[1].passedExpectations[0].screenshots.length).toBe(1);
+        expect(report.tests[1].specLogs[0].logs.length).toBe(5);
+        expect(report.tests[1].specLogs[0].logs[0].level).toBe('SEVERE');
+        expect(report.tests[1].specLogs[0].logs[0].message).toContain('sample error 4');
+        expect(report.tests[1].specLogs[0].logs[1].level).toBe('WARNING');
+        expect(report.tests[1].specLogs[0].logs[1].message).toContain('sample warning 4');
+        expect(report.tests[1].specLogs[0].logs[2].level).toBe('INFO');
+        expect(report.tests[1].specLogs[0].logs[2].message).toContain('sample info 4');
+        expect(report.tests[1].specLogs[0].logs[3].level).toBe('INFO');
+        expect(report.tests[1].specLogs[0].logs[3].message).toContain('sample log same as info 4');
+        expect(report.tests[1].specLogs[0].logs[4].level).toBe('DEBUG');
+        expect(report.tests[1].specLogs[0].logs[4].message).toContain('sample debug 4');
+        expect(report.tests[1].specScreenshots.length).toBe(1);
+
+        done();
+      });
+    });
+
+    it("should generate failure screenshots", function(done) {
+      fs.readdir('.tmp/failuresWithLogsAsap/screenshots', function(err, items) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(items.length).toEqual(4);
         done();
       });
     });
@@ -527,11 +766,11 @@ describe("Screenshoter running under protractor", function() {
         expect(report.tests[0].specScreenshots.length).toBe(2);
 
         expect(report.tests[0].specScreenshots[0].img).toBeDefined();
-        expect(report.tests[0].specScreenshots[0].browser).toBe('first');
+        expect(report.tests[0].specScreenshots[0].browser).toBe('first [chrome]');
         expect(report.tests[0].specScreenshots[0].when).toBeDefined();
 
         expect(report.tests[0].specScreenshots[1].img).toBeDefined();
-        expect(report.tests[0].specScreenshots[1].browser).toBe('second');
+        expect(report.tests[0].specScreenshots[1].browser).toBe('second [chrome]');
         expect(report.tests[0].specScreenshots[1].when).toBeDefined();
 
         expect(report.tests[0].failedExpectations.length).toBe(0);
@@ -544,19 +783,19 @@ describe("Screenshoter running under protractor", function() {
         expect(report.tests[0].passedExpectations[0].screenshots.length).toBe(2);
 
         expect(report.tests[0].passedExpectations[0].screenshots[0].img).toBeDefined();
-        expect(report.tests[0].passedExpectations[0].screenshots[0].browser).toBe('first');
+        expect(report.tests[0].passedExpectations[0].screenshots[0].browser).toBe('first [chrome]');
         expect(report.tests[0].passedExpectations[0].screenshots[0].when).toBeDefined();
 
         expect(report.tests[0].passedExpectations[0].screenshots[1].img).toBeDefined();
-        expect(report.tests[0].passedExpectations[0].screenshots[1].browser).toBe('second');
+        expect(report.tests[0].passedExpectations[0].screenshots[1].browser).toBe('second [chrome]');
         expect(report.tests[0].passedExpectations[0].screenshots[1].when).toBeDefined();
 
         expect(report.tests[0].passedExpectations[1].screenshots[0].img).toBeDefined();
-        expect(report.tests[0].passedExpectations[1].screenshots[0].browser).toBe('first');
+        expect(report.tests[0].passedExpectations[1].screenshots[0].browser).toBe('first [chrome]');
         expect(report.tests[0].passedExpectations[1].screenshots[0].when).toBeDefined();
 
         expect(report.tests[0].passedExpectations[1].screenshots[1].img).toBeDefined();
-        expect(report.tests[0].passedExpectations[1].screenshots[1].browser).toBe('second');
+        expect(report.tests[0].passedExpectations[1].screenshots[1].browser).toBe('second [chrome]');
         expect(report.tests[0].passedExpectations[1].screenshots[1].when).toBeDefined();
 
         done();
@@ -613,13 +852,13 @@ describe("Screenshoter running under protractor", function() {
         expect(report.tests[0].specScreenshots.length).toBe(1);
 
         expect(report.tests[0].specScreenshots[0].img).toBeDefined();
-        expect(report.tests[0].specScreenshots[0].browser).toBe('default');
+        expect(report.tests[0].specScreenshots[0].browser).toBe('chrome');
         expect(report.tests[0].specScreenshots[0].when).toBeDefined();
 
         expect(report.tests[0].failedExpectations.length).toBe(1);
 
         expect(report.tests[0].failedExpectations[0].screenshots[0].img).toBeDefined();
-        expect(report.tests[0].failedExpectations[0].screenshots[0].browser).toBe('default');
+        expect(report.tests[0].failedExpectations[0].screenshots[0].browser).toBe('chrome');
         expect(report.tests[0].failedExpectations[0].screenshots[0].when).toBeDefined();
 
         expect(report.tests[0].passedExpectations.length).toBe(1);
@@ -630,19 +869,19 @@ describe("Screenshoter running under protractor", function() {
         expect(report.tests[1].specScreenshots.length).toBe(2);
 
         expect(report.tests[1].specScreenshots[0].img).toBeDefined();
-        expect(report.tests[1].specScreenshots[0].browser).toBe('first');
+        expect(report.tests[1].specScreenshots[0].browser).toBe('first [chrome]');
         expect(report.tests[1].specScreenshots[0].when).toBeDefined();
 
         expect(report.tests[1].specScreenshots[1].img).toBeDefined();
-        expect(report.tests[1].specScreenshots[1].browser).toBe('second');
+        expect(report.tests[1].specScreenshots[1].browser).toBe('second [chrome]');
         expect(report.tests[1].specScreenshots[1].when).toBeDefined();
 
         expect(report.tests[1].failedExpectations[0].screenshots[0].img).toBeDefined();
-        expect(report.tests[1].failedExpectations[0].screenshots[0].browser).toBe('first');
+        expect(report.tests[1].failedExpectations[0].screenshots[0].browser).toBe('first [chrome]');
         expect(report.tests[1].failedExpectations[0].screenshots[0].when).toBeDefined();
 
         expect(report.tests[1].failedExpectations[0].screenshots[1].img).toBeDefined();
-        expect(report.tests[1].failedExpectations[0].screenshots[1].browser).toBe('second');
+        expect(report.tests[1].failedExpectations[0].screenshots[1].browser).toBe('second [chrome]');
         expect(report.tests[1].failedExpectations[0].screenshots[1].when).toBeDefined();
 
         expect(report.tests[1].passedExpectations.length).toBe(1);
@@ -940,6 +1179,99 @@ describe("Screenshoter running under protractor", function() {
         expect(report.stat.disabled).toBe(2);
         expect(report.stat.failed).toBe(0);
         expect(report.generatedOn).toBeDefined();
+        done();
+      });
+    });
+  });
+
+  describe("verbose", function() {
+    it("should run without errors", function() {
+      expect(runProtractorWithConfig('verbose.js')).toBeTruthy();
+    });
+  });
+
+  describe("pause on failure", function() {
+    beforeAll(function() {
+      runProtractorWithConfig('pause.js');
+    });
+
+    it("should generate report.js with fake console log browser was paused", function(done) {
+      fs.readFile('.tmp/pause/report.js', 'utf8', function(err, data) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(data).toContain("angular.module('reporter').constant('data'");
+
+        var report = getReportAsJson(data);
+        expect(report.tests.length).toBe(1);
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[0].level).toBe('WARNING');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[0].message).toContain('browser was paused');
+        done();
+      });
+    });
+
+  });
+
+  describe("pause on spec", function() {
+    beforeAll(function() {
+      runProtractorWithConfig('pause-spec.js');
+    });
+
+    it("must be paused via workaround", function(done) {
+      fs.readFile('.tmp/pause-spec/paused-workaround.txt', 'utf8', function(err) {
+        if (err) {
+          return done.fail(err);
+        }
+        done();
+      });
+    })
+
+    it("should generate report.js", function(done) {
+      fs.readFile('.tmp/pause-spec/report.js', 'utf8', function(err, data) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(data).toContain("angular.module('reporter').constant('data'");
+
+        var report = getReportAsJson(data);
+        expect(report.tests.length).toBe(1);
+        done();
+      });
+    });
+
+  });
+
+  describe("suitesConsoleErrors", function() {
+    it("should fail if the console-error suite is specified in 'suites'", function(done) {
+      runProtractorWithConfig('suitesConsoleErrors.js', '--suite=console');
+
+      fs.readFile('.tmp/suitesConsoleErrors/report.js', 'utf8', function(err, data) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(data).toContain("angular.module('reporter').constant('data'");
+
+        var report = getReportAsJson(data);
+        expect(report.tests[0].failedExpectations.length).toBe(1); //Console-error
+        expect(report.tests[1].failedExpectations.length).toBe(1); //Console-error
+        done();
+      });
+    });
+  });
+
+  describe("suitesHomepage", function() {
+    it("should pass if the console-error suite is not specified in 'suites'", function(done) {
+      runProtractorWithConfig('suitesHomepage.js', '--suite=console');
+
+      fs.readFile('.tmp/suitesHomepage/report.js', 'utf8', function(err, data) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(data).toContain("angular.module('reporter').constant('data'");
+
+        var report = getReportAsJson(data);
+        expect(report.tests[0].failedExpectations.length).toBe(0);
+        expect(report.tests[1].failedExpectations.length).toBe(0);
         done();
       });
     });

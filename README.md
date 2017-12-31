@@ -22,6 +22,7 @@ This plugin captures for each **expectation** or **spec** console **logs** and m
 6. Supports gitlab.com CI/CD, circleci.com (the report displays a build number, a branch, etc. )
 7. Supports parallel tests execution
 8. Makes optional Ascii screenshots
+9. Multi capabilities are supported
 
 Additional HTML reporter features:
 
@@ -67,11 +68,28 @@ Also, I created a list of [alternatives](https://github.com/azachar/protractor-s
 
 # How to install
 
+If your protractor is installed locally, then
+
 ```
 npm install azachar/protractor-screenshoter-plugin#feat-speech
 npm install say
 sudo apt-get install festival
 ```
+
+If your protractor is installed globally, then
+```
+npm install --global protractor-screenshoter-plugin
+```
+
+or install this plugin locally, but then you must specify the plugin's path like this:
+
+```
+    plugins: [{
+        package: 'node_modules/protractor-screenshoter-plugin/index.js',
+        ...
+    }],
+```
+as mentioned in #37.
 
 **NOTE**:
 
@@ -137,7 +155,7 @@ exports.config = {
         screenshotPath: './REPORTS/e2e',
         screenshotOnExpect: 'failure+success',
         screenshotOnSpec: 'none',
-        withLogs: 'true',
+        withLogs: true,
         writeReportFreq: 'asap',
         imageToAscii: 'none',
         clearFoldersBeforeTest: true
@@ -172,6 +190,7 @@ exports.config = {
        failTestOnErrorLog: {
                 failTestOnErrorLogLevel: {Number},  (Default - 900)
                 excludeKeywords: {A JSON Array}
+                suites: {A JSON Array}
            }
        }],
        speak: {Boolean}      (Default - false),
@@ -232,7 +251,7 @@ exports.config = {
         screenshotPath: './REPORTS/e2e',
         screenshotOnExpect: 'failure+success',
         screenshotOnSpec: 'none',
-        withLogs: 'true',
+        withLogs: true,
         writeReportFreq: 'asap',
         clearFoldersBeforeTest: true
     }],
@@ -381,6 +400,12 @@ An array of keywords to be excluded while searching for error logs. i.e If a log
 
 Please do not specify this flag, if you don't supply any such keywords.
 
+### suites
+
+An array of `suites` (protractor.config.suites) where the failTestOnErrorLog will run.
+
+Please do not specify this flag, if you want all your tests to run through this failTestOnErrorLog validation.
+
 # Development
 
 After cloning the project you can run tests as follows:
@@ -394,8 +419,13 @@ To run without coverage report including some debug logging use  `npm run testin
 
 
 ## Committing
-
 Please use `git-cz` to format your commit message.
+
+Before committing, please check your changes with
+```
+npm run lint
+```
+and fix your code style issues.
 
 ## Contributing
 - Your PR is more than welcome!
