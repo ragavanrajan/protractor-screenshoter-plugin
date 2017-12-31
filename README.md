@@ -22,6 +22,7 @@ This plugin captures for each **expectation** or **spec** console **logs** and m
 6. Supports gitlab.com CI/CD, circleci.com (the report displays a build number, a branch, etc. )
 7. Supports parallel tests execution
 8. Makes optional Ascii screenshots
+9. Multi capabilities are supported
 
 Additional HTML reporter features:
 
