@@ -507,6 +507,182 @@ describe("Screenshoter running under protractor", function() {
     });
   });
 
+  describe("failures with logs", function() {
+
+    beforeAll(function() {
+      runProtractorWithConfig('failuresWithLogs.js');
+    });
+
+    it("should generate report.js with logs", function(done) {
+      fs.readFile('.tmp/failuresWithLogs/report.js', 'utf8', function(err, data) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(data).toContain("angular.module('reporter').constant('data'");
+
+        var report = getReportAsJson(data);
+        expect(report.stat.passed).toBe(1);
+        expect(report.stat.failed).toBe(1);
+
+        expect(report.tests.length).toBe(2);
+        expect(report.tests[0].passedExpectations.length).toBe(0);
+        expect(report.tests[0].failedExpectations.length).toBe(1);
+        expect(report.tests[0].failedExpectations[0].logs[0].logs.length).toBe(5);
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[0].level).toBe('SEVERE');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[0].message).toContain('sample error 1');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[1].level).toBe('WARNING');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[1].message).toContain('sample warning 1');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[2].level).toBe('INFO');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[2].message).toContain('sample info 1');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[3].level).toBe('INFO');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[3].message).toContain('sample log same as info 1');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[4].level).toBe('DEBUG');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[4].message).toContain('sample debug 1');
+        expect(report.tests[0].failedExpectations[0].screenshots.length).toBe(1);
+        expect(report.tests[0].specLogs[0].logs.length).toBe(5);
+        expect(report.tests[0].specLogs[0].logs[0].level).toBe('SEVERE');
+        expect(report.tests[0].specLogs[0].logs[0].message).toContain('sample error 2');
+        expect(report.tests[0].specLogs[0].logs[1].level).toBe('WARNING');
+        expect(report.tests[0].specLogs[0].logs[1].message).toContain('sample warning 2');
+        expect(report.tests[0].specLogs[0].logs[2].level).toBe('INFO');
+        expect(report.tests[0].specLogs[0].logs[2].message).toContain('sample info 2');
+        expect(report.tests[0].specLogs[0].logs[3].level).toBe('INFO');
+        expect(report.tests[0].specLogs[0].logs[3].message).toContain('sample log same as info 2');
+        expect(report.tests[0].specLogs[0].logs[4].level).toBe('DEBUG');
+        expect(report.tests[0].specLogs[0].logs[4].message).toContain('sample debug 2');
+        expect(report.tests[0].specScreenshots.length).toBe(1);
+
+        expect(report.tests[1].failedExpectations.length).toBe(0);
+        expect(report.tests[1].passedExpectations.length).toBe(1);
+        expect(report.tests[1].passedExpectations[0].logs[0].logs.length).toBe(5);
+        expect(report.tests[1].passedExpectations[0].logs[0].logs.length).toBe(5);
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[0].level).toBe('SEVERE');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[0].message).toContain('sample error 3');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[1].level).toBe('WARNING');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[1].message).toContain('sample warning 3');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[2].level).toBe('INFO');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[2].message).toContain('sample info 3');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[3].level).toBe('INFO');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[3].message).toContain('sample log same as info 3');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[4].level).toBe('DEBUG');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[4].message).toContain('sample debug 3');
+        expect(report.tests[1].passedExpectations[0].screenshots.length).toBe(1);
+        expect(report.tests[1].specLogs[0].logs.length).toBe(5);
+        expect(report.tests[1].specLogs[0].logs[0].level).toBe('SEVERE');
+        expect(report.tests[1].specLogs[0].logs[0].message).toContain('sample error 4');
+        expect(report.tests[1].specLogs[0].logs[1].level).toBe('WARNING');
+        expect(report.tests[1].specLogs[0].logs[1].message).toContain('sample warning 4');
+        expect(report.tests[1].specLogs[0].logs[2].level).toBe('INFO');
+        expect(report.tests[1].specLogs[0].logs[2].message).toContain('sample info 4');
+        expect(report.tests[1].specLogs[0].logs[3].level).toBe('INFO');
+        expect(report.tests[1].specLogs[0].logs[3].message).toContain('sample log same as info 4');
+        expect(report.tests[1].specLogs[0].logs[4].level).toBe('DEBUG');
+        expect(report.tests[1].specLogs[0].logs[4].message).toContain('sample debug 4');
+        expect(report.tests[1].specScreenshots.length).toBe(1);
+
+        done();
+      });
+    });
+
+    it("should generate failure screenshots", function(done) {
+      fs.readdir('.tmp/failuresWithLogs/screenshots', function(err, items) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(items.length).toEqual(4);
+        done();
+      });
+    });
+  });
+
+  describe("failures with asap logs", function() {
+
+    beforeAll(function() {
+      runProtractorWithConfig('failuresWithLogsAsap.js');
+    });
+
+    it("should generate report.js with logs", function(done) {
+      fs.readFile('.tmp/failuresWithLogsAsap/report.js', 'utf8', function(err, data) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(data).toContain("angular.module('reporter').constant('data'");
+
+        var report = getReportAsJson(data);
+        expect(report.stat.passed).toBe(1);
+        expect(report.stat.failed).toBe(1);
+
+        expect(report.tests.length).toBe(2);
+        expect(report.tests[0].passedExpectations.length).toBe(0);
+        expect(report.tests[0].failedExpectations.length).toBe(1);
+        expect(report.tests[0].failedExpectations[0].logs[0].logs.length).toBe(5);
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[0].level).toBe('SEVERE');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[0].message).toContain('sample error 1');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[1].level).toBe('WARNING');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[1].message).toContain('sample warning 1');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[2].level).toBe('INFO');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[2].message).toContain('sample info 1');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[3].level).toBe('INFO');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[3].message).toContain('sample log same as info 1');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[4].level).toBe('DEBUG');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[4].message).toContain('sample debug 1');
+        expect(report.tests[0].failedExpectations[0].screenshots.length).toBe(1);
+        expect(report.tests[0].specLogs[0].logs.length).toBe(5);
+        expect(report.tests[0].specLogs[0].logs[0].level).toBe('SEVERE');
+        expect(report.tests[0].specLogs[0].logs[0].message).toContain('sample error 2');
+        expect(report.tests[0].specLogs[0].logs[1].level).toBe('WARNING');
+        expect(report.tests[0].specLogs[0].logs[1].message).toContain('sample warning 2');
+        expect(report.tests[0].specLogs[0].logs[2].level).toBe('INFO');
+        expect(report.tests[0].specLogs[0].logs[2].message).toContain('sample info 2');
+        expect(report.tests[0].specLogs[0].logs[3].level).toBe('INFO');
+        expect(report.tests[0].specLogs[0].logs[3].message).toContain('sample log same as info 2');
+        expect(report.tests[0].specLogs[0].logs[4].level).toBe('DEBUG');
+        expect(report.tests[0].specLogs[0].logs[4].message).toContain('sample debug 2');
+        expect(report.tests[0].specScreenshots.length).toBe(1);
+
+        expect(report.tests[1].failedExpectations.length).toBe(0);
+        expect(report.tests[1].passedExpectations.length).toBe(1);
+        expect(report.tests[1].passedExpectations[0].logs[0].logs.length).toBe(5);
+        expect(report.tests[1].passedExpectations[0].logs[0].logs.length).toBe(5);
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[0].level).toBe('SEVERE');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[0].message).toContain('sample error 3');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[1].level).toBe('WARNING');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[1].message).toContain('sample warning 3');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[2].level).toBe('INFO');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[2].message).toContain('sample info 3');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[3].level).toBe('INFO');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[3].message).toContain('sample log same as info 3');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[4].level).toBe('DEBUG');
+        expect(report.tests[1].passedExpectations[0].logs[0].logs[4].message).toContain('sample debug 3');
+        expect(report.tests[1].passedExpectations[0].screenshots.length).toBe(1);
+        expect(report.tests[1].specLogs[0].logs.length).toBe(5);
+        expect(report.tests[1].specLogs[0].logs[0].level).toBe('SEVERE');
+        expect(report.tests[1].specLogs[0].logs[0].message).toContain('sample error 4');
+        expect(report.tests[1].specLogs[0].logs[1].level).toBe('WARNING');
+        expect(report.tests[1].specLogs[0].logs[1].message).toContain('sample warning 4');
+        expect(report.tests[1].specLogs[0].logs[2].level).toBe('INFO');
+        expect(report.tests[1].specLogs[0].logs[2].message).toContain('sample info 4');
+        expect(report.tests[1].specLogs[0].logs[3].level).toBe('INFO');
+        expect(report.tests[1].specLogs[0].logs[3].message).toContain('sample log same as info 4');
+        expect(report.tests[1].specLogs[0].logs[4].level).toBe('DEBUG');
+        expect(report.tests[1].specLogs[0].logs[4].message).toContain('sample debug 4');
+        expect(report.tests[1].specScreenshots.length).toBe(1);
+
+        done();
+      });
+    });
+
+    it("should generate failure screenshots", function(done) {
+      fs.readdir('.tmp/failuresWithLogsAsap/screenshots', function(err, items) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(items.length).toEqual(4);
+        done();
+      });
+    });
+  });
+
   describe("none", function() {
 
     beforeAll(function() {
