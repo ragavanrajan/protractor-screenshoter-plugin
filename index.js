@@ -51,17 +51,25 @@ protractorUtil.logInfo = console.info;
 protractorUtil.logError = console.error;
 
 protractorUtil.forEachBrowser = function(action) {
+  function catchError(err) {
+    console.warn('Unknown error:');
+    console.warn(err);
+  }
+
   try {
     if (global.screenshotBrowsers && Object.keys(global.screenshotBrowsers).length > 0) {
       _.forOwn(global.screenshotBrowsers, function(instance, name) {
-        action(instance, name, protractorUtil.newLongRunningOperationCounter());
+        instance.getCapabilities().then(function(capabilities) {
+          action(instance, name + ' [' + capabilities.get('browserName') + ']', protractorUtil.newLongRunningOperationCounter());
+        }).catch(catchError);
       });
     } else {
-      action(global.browser, 'default', protractorUtil.newLongRunningOperationCounter());
+      global.browser.getCapabilities().then(function(capabilities) {
+        action(global.browser, capabilities.get('browserName'), protractorUtil.newLongRunningOperationCounter());
+      }).catch(catchError);
     }
   } catch (err) {
-    console.warn('Unknown error:');
-    console.warn(err);
+    catchError(err);
   }
 };
 

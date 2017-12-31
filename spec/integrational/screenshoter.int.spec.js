@@ -189,6 +189,68 @@ describe("Screenshoter running under protractor", function() {
 
   });
 
+  describe("default browser name is read from capabilities", function() {
+
+    beforeAll(function() {
+      runProtractorWithConfig('name.js');
+    });
+
+    it("should generate report.js with named browser", function(done) {
+      fs.readFile('.tmp/name/report.js', 'utf8', function(err, data) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(data).toContain("angular.module('reporter').constant('data'");
+
+        var report = getReportAsJson(data);
+        expect(report.stat.passed).toBe(3);
+        expect(report.tests.length).toBe(3);
+        expect(report.tests[0].specScreenshots[0].browser).toEqual(env.capabilities.browserName);
+        expect(report.tests[0].passedExpectations[0].screenshots[0].browser).toEqual(env.capabilities.browserName);
+
+        expect(report.tests[1].specScreenshots[0].browser).toEqual(env.capabilities.browserName);
+        expect(report.tests[1].passedExpectations[0].screenshots[0].browser).toEqual(env.capabilities.browserName);
+        expect(report.tests[1].passedExpectations[1].screenshots[0].browser).toEqual(env.capabilities.browserName);
+
+        expect(report.tests[2].specScreenshots[0].browser).toEqual(env.capabilities.browserName);
+        expect(report.tests[2].passedExpectations[0].screenshots[0].browser).toEqual(env.capabilities.browserName);
+
+        done();
+      });
+    });
+
+  });
+
+  describe("chrome browser name is read from multiCapabilities", function() {
+
+    beforeAll(function() {
+      runProtractorWithConfig('name-multi.js');
+    });
+
+    it("should generate report.js with different browser names", function(done) {
+      fs.readFile('.tmp/name-multi/report.js', 'utf8', function(err, data) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(data).toContain("angular.module('reporter').constant('data'");
+
+        var report = getReportAsJson(data);
+        expect(report.stat.passed).toBe(6);
+        expect(report.tests.length).toBe(6);
+
+        expect(report.tests[0].specScreenshots[0].browser).toEqual('chrome');
+        expect(report.tests[1].specScreenshots[0].browser).toEqual('chrome');
+        expect(report.tests[2].specScreenshots[0].browser).toEqual('chrome');
+
+        expect(report.tests[3].specScreenshots[0].browser).toEqual('firefox');
+        expect(report.tests[4].specScreenshots[0].browser).toEqual('firefox');
+        expect(report.tests[5].specScreenshots[0].browser).toEqual('firefox');
+        done();
+      });
+    });
+
+  });
+
   describe("suggested configuration from readme", function() {
 
     beforeAll(function() {
@@ -529,11 +591,11 @@ describe("Screenshoter running under protractor", function() {
         expect(report.tests[0].specScreenshots.length).toBe(2);
 
         expect(report.tests[0].specScreenshots[0].img).toBeDefined();
-        expect(report.tests[0].specScreenshots[0].browser).toBe('first');
+        expect(report.tests[0].specScreenshots[0].browser).toBe('first [chrome]');
         expect(report.tests[0].specScreenshots[0].when).toBeDefined();
 
         expect(report.tests[0].specScreenshots[1].img).toBeDefined();
-        expect(report.tests[0].specScreenshots[1].browser).toBe('second');
+        expect(report.tests[0].specScreenshots[1].browser).toBe('second [chrome]');
         expect(report.tests[0].specScreenshots[1].when).toBeDefined();
 
         expect(report.tests[0].failedExpectations.length).toBe(0);
@@ -546,19 +608,19 @@ describe("Screenshoter running under protractor", function() {
         expect(report.tests[0].passedExpectations[0].screenshots.length).toBe(2);
 
         expect(report.tests[0].passedExpectations[0].screenshots[0].img).toBeDefined();
-        expect(report.tests[0].passedExpectations[0].screenshots[0].browser).toBe('first');
+        expect(report.tests[0].passedExpectations[0].screenshots[0].browser).toBe('first [chrome]');
         expect(report.tests[0].passedExpectations[0].screenshots[0].when).toBeDefined();
 
         expect(report.tests[0].passedExpectations[0].screenshots[1].img).toBeDefined();
-        expect(report.tests[0].passedExpectations[0].screenshots[1].browser).toBe('second');
+        expect(report.tests[0].passedExpectations[0].screenshots[1].browser).toBe('second [chrome]');
         expect(report.tests[0].passedExpectations[0].screenshots[1].when).toBeDefined();
 
         expect(report.tests[0].passedExpectations[1].screenshots[0].img).toBeDefined();
-        expect(report.tests[0].passedExpectations[1].screenshots[0].browser).toBe('first');
+        expect(report.tests[0].passedExpectations[1].screenshots[0].browser).toBe('first [chrome]');
         expect(report.tests[0].passedExpectations[1].screenshots[0].when).toBeDefined();
 
         expect(report.tests[0].passedExpectations[1].screenshots[1].img).toBeDefined();
-        expect(report.tests[0].passedExpectations[1].screenshots[1].browser).toBe('second');
+        expect(report.tests[0].passedExpectations[1].screenshots[1].browser).toBe('second [chrome]');
         expect(report.tests[0].passedExpectations[1].screenshots[1].when).toBeDefined();
 
         done();
@@ -615,13 +677,13 @@ describe("Screenshoter running under protractor", function() {
         expect(report.tests[0].specScreenshots.length).toBe(1);
 
         expect(report.tests[0].specScreenshots[0].img).toBeDefined();
-        expect(report.tests[0].specScreenshots[0].browser).toBe('default');
+        expect(report.tests[0].specScreenshots[0].browser).toBe('chrome');
         expect(report.tests[0].specScreenshots[0].when).toBeDefined();
 
         expect(report.tests[0].failedExpectations.length).toBe(1);
 
         expect(report.tests[0].failedExpectations[0].screenshots[0].img).toBeDefined();
-        expect(report.tests[0].failedExpectations[0].screenshots[0].browser).toBe('default');
+        expect(report.tests[0].failedExpectations[0].screenshots[0].browser).toBe('chrome');
         expect(report.tests[0].failedExpectations[0].screenshots[0].when).toBeDefined();
 
         expect(report.tests[0].passedExpectations.length).toBe(1);
@@ -632,19 +694,19 @@ describe("Screenshoter running under protractor", function() {
         expect(report.tests[1].specScreenshots.length).toBe(2);
 
         expect(report.tests[1].specScreenshots[0].img).toBeDefined();
-        expect(report.tests[1].specScreenshots[0].browser).toBe('first');
+        expect(report.tests[1].specScreenshots[0].browser).toBe('first [chrome]');
         expect(report.tests[1].specScreenshots[0].when).toBeDefined();
 
         expect(report.tests[1].specScreenshots[1].img).toBeDefined();
-        expect(report.tests[1].specScreenshots[1].browser).toBe('second');
+        expect(report.tests[1].specScreenshots[1].browser).toBe('second [chrome]');
         expect(report.tests[1].specScreenshots[1].when).toBeDefined();
 
         expect(report.tests[1].failedExpectations[0].screenshots[0].img).toBeDefined();
-        expect(report.tests[1].failedExpectations[0].screenshots[0].browser).toBe('first');
+        expect(report.tests[1].failedExpectations[0].screenshots[0].browser).toBe('first [chrome]');
         expect(report.tests[1].failedExpectations[0].screenshots[0].when).toBeDefined();
 
         expect(report.tests[1].failedExpectations[0].screenshots[1].img).toBeDefined();
-        expect(report.tests[1].failedExpectations[0].screenshots[1].browser).toBe('second');
+        expect(report.tests[1].failedExpectations[0].screenshots[1].browser).toBe('second [chrome]');
         expect(report.tests[1].failedExpectations[0].screenshots[1].when).toBeDefined();
 
         expect(report.tests[1].passedExpectations.length).toBe(1);
@@ -932,7 +994,7 @@ describe("Screenshoter running under protractor", function() {
           return done.fail(err);
         }
         expect(data).toContain("angular.module('reporter').constant('data'");
-        
+
         var report = getReportAsJson(data);
         expect(report.tests[0].failedExpectations.length).toBe(1); //Console-error
         expect(report.tests[1].failedExpectations.length).toBe(1); //Console-error
@@ -942,16 +1004,16 @@ describe("Screenshoter running under protractor", function() {
   });
 
   describe("suitesHomepage", function() {
-      
+
     it("should pass if the console-error suite is not specified in 'suites'", function(done) {
       runProtractorWithConfig('suitesHomepage.js', '--suite=console');
-      
+
       fs.readFile('.tmp/suitesHomepage/report.js', 'utf8', function(err, data) {
         if (err) {
           return done.fail(err);
         }
         expect(data).toContain("angular.module('reporter').constant('data'");
-        
+
         var report = getReportAsJson(data);
         expect(report.tests[0].failedExpectations.length).toBe(0);
         expect(report.tests[1].failedExpectations.length).toBe(0);
