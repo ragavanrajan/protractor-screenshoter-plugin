@@ -381,8 +381,13 @@ To run without coverage report including some debug logging use  `npm run testin
 
 
 ## Committing
-
 Please use `git-cz` to format your commit message.
+
+Before committing, please check your changes with
+```
+npm run lint
+```
+and fix your code style issues.
 
 ## Contributing
 - Your PR is more than welcome!

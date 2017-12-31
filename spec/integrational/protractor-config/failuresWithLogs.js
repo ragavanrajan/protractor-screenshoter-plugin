@@ -16,5 +16,5 @@ exports.config = {
     screenshotOnExpect: 'failure+success',
     screenshotOnSpec: 'failure+success',
     withLogs: true
-  }],
+  }]
 };

@@ -6,9 +6,9 @@ exports.config = {
   specs: ['../protractor/angularjs-homepage-test.js'],
   plugins: [{
     path: '../../../index.js',
-    screenshotPath: '.tmp/name',
+    screenshotPath: '.tmp/name'
   }],
   capabilities: {
-    'browserName': env.capabilities.browserName,
+    'browserName': env.capabilities.browserName
   }
 };

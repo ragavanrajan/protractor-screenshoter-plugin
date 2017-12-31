@@ -1,5 +1,4 @@
 var env = require('./environment');
-var path = require('path');
 
 var fs = require('fs-extra');
 var cp = require('child_process');
@@ -9,9 +8,9 @@ function runProtractorWithConfig(configName, params) {
   if (env.coverage) {
     command = 'nyc --reporter lcov ' + command;
   }
-
-  params = params ? ' ' + params : '';
-  command += params;
+  if (params) {
+    command += ' ' + params;
+  }
 
   console.info('Running command ' + command);
   try {
@@ -436,7 +435,7 @@ describe("Screenshoter running under protractor", function() {
     });
 
     it("should not install reporter", function(done) {
-      fs.readFile('.tmp/nohtml/index.html', 'utf8', function(err, data) {
+      fs.readFile('.tmp/nohtml/index.html', 'utf8', function(err) {
         if (err) {
           return done();
         }
@@ -1218,9 +1217,8 @@ describe("Screenshoter running under protractor", function() {
   });
 
   describe("suitesConsoleErrors", function() {
-
     it("should fail if the console-error suite is specified in 'suites'", function(done) {
-      runProtractorWithConfig('suitesConsoleErrors.js', '--suite=\"console\"');
+      runProtractorWithConfig('suitesConsoleErrors.js', '--suite=console');
 
       fs.readFile('.tmp/suitesConsoleErrors/report.js', 'utf8', function(err, data) {
         if (err) {
@@ -1237,7 +1235,6 @@ describe("Screenshoter running under protractor", function() {
   });
 
   describe("suitesHomepage", function() {
-
     it("should pass if the console-error suite is not specified in 'suites'", function(done) {
       runProtractorWithConfig('suitesHomepage.js', '--suite=console');
 

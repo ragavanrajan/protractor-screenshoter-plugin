@@ -338,7 +338,7 @@ protractorUtil.registerJasmineReporter = function(context) {
         protractorUtil.installReporter(context);
       }
     },
-    specStarted: function(result) {
+    specStarted: function() {
       protractorUtil.test = {
         start: moment(),
         specScreenshots: [],
@@ -386,7 +386,7 @@ protractorUtil.registerJasmineReporter = function(context) {
  * @return {!webdriver.promise.Promise.<R>} A promise
  */
 protractorUtil.failTestOnErrorLog = function(context) {
-  return global.browser.getProcessedConfig().then(function(config) {
+  return global.browser.getProcessedConfig().then(function() {
     beforeEach(function() {
       /*
        * A Jasmine custom matcher
@@ -538,7 +538,7 @@ protractorUtil.newLongRunningOperationCounter = function() {
   protractorUtil.runningOperations++;
   // protractorUtil.logDebug('Open operations ', protractorUtil.runningOperations);
 
-  return function(err, result) {
+  return function() {
     protractorUtil.runningOperations--;
     // protractorUtil.logDebug('Remaining operations ', protractorUtil.runningOperations);
   }
@@ -549,7 +549,7 @@ protractorUtil.prototype.teardown = function() {
   var self = this;
 
   function finish() {
-    protractorUtil.writeReport(self, function(err, result) {
+    protractorUtil.writeReport(self, function(err) {
       if (err) {
         protractorUtil.logDebug(err);
       }

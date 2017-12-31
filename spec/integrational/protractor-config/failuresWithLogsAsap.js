@@ -17,5 +17,5 @@ exports.config = {
     screenshotOnSpec: 'failure+success',
     withLogs: true,
     writeReportFreq: 'asap'
-  }],
+  }]
 };
