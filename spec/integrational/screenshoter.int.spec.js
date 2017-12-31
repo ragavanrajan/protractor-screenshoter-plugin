@@ -1160,6 +1160,12 @@ describe("Screenshoter running under protractor", function() {
     });
   });
 
+  describe("verbose", function() {
+    it("should run without errors", function() {
+      expect(runProtractorWithConfig('verbose.js')).toBeTruthy();
+    });
+  });
+
   describe("suitesConsoleErrors", function() {
 
     it("should fail if the console-error suite is specified in 'suites'", function(done) {
