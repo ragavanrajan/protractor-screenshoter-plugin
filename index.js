@@ -369,7 +369,7 @@ protractorUtil.registerJasmineReporter = function(context) {
       }
 
       var passed = result.failedExpectations.length === 0;
-      if (!passed && context.config.pauseOn === 'failure') {
+      if (!passed && context.config.pauseOn === 'spec') {
         protractorUtil.logInfo('Pause browser because of a spec failed  - %s', result.name);
         protractorUtil.logDebug(result.failedExpectations[0].message);
         protractorUtil.logDebug(result.failedExpectations[0].stack);

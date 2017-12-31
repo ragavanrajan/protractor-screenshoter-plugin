@@ -1166,6 +1166,57 @@ describe("Screenshoter running under protractor", function() {
     });
   });
 
+  describe("pause on failure", function() {
+    beforeAll(function() {
+      runProtractorWithConfig('pause.js');
+    });
+
+    it("should generate report.js with fake console log browser was paused", function(done) {
+      fs.readFile('.tmp/pause/report.js', 'utf8', function(err, data) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(data).toContain("angular.module('reporter').constant('data'");
+
+        var report = getReportAsJson(data);
+        expect(report.tests.length).toBe(1);
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[0].level).toBe('WARNING');
+        expect(report.tests[0].failedExpectations[0].logs[0].logs[0].message).toContain('browser was paused');
+        done();
+      });
+    });
+
+  });
+
+  describe("pause on spec", function() {
+    beforeAll(function() {
+      runProtractorWithConfig('pause-spec.js');
+    });
+
+    it("must be paused via workaround", function(done) {
+      fs.readFile('.tmp/pause-spec/paused-workaround.txt', 'utf8', function(err) {
+        if (err) {
+          return done.fail(err);
+        }
+        done();
+      });
+    })
+
+    it("should generate report.js", function(done) {
+      fs.readFile('.tmp/pause-spec/report.js', 'utf8', function(err, data) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(data).toContain("angular.module('reporter').constant('data'");
+
+        var report = getReportAsJson(data);
+        expect(report.tests.length).toBe(1);
+        done();
+      });
+    });
+
+  });
+
   describe("suitesConsoleErrors", function() {
 
     it("should fail if the console-error suite is specified in 'suites'", function(done) {
