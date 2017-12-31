@@ -151,9 +151,6 @@ protractorUtil.takeScreenshotOnExpectDone = function(context) {
         });
         if (makeAsciiLog && !browserInstance.skipImageToAscii) {
           try {
-            if (!imageToAscii) {
-              throw new Error('image-to-ascii is not installed');
-            }
             imageToAscii(finalFile, context.config.imageToAsciiOpts, function(err, converted) {
               var asciImage;
               asciImage += '\n\n============================\n';
@@ -408,10 +405,10 @@ protractorUtil.failTestOnErrorLog = function(context) {
 
       /*
        * Verifies if the `suite` where tests are running is present on the `failTestOnErrorLog.suites` list
-      */
+       */
       function isASuiteToCheck() {
         //If there are no suites defined the default value is 'ALL'
-        if(!context.config.failTestOnErrorLog.suites) {
+        if (!context.config.failTestOnErrorLog.suites) {
           return true;
         }
 
