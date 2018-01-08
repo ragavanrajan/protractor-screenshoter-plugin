@@ -12,7 +12,7 @@
 
 # protractor-screenshoter-plugin
 
-This plugin captures for each **expectation** or **spec** console **logs** and makes **screenshots** for **each browser** instance. Also it comes with a beautifull angular based [HTML reporter for chat alike apps](https://github.com/azachar/screenshoter-report-analyzer).
+This plugin captures for each **expectation** or **spec** console **logs** and makes **screenshots** and **raw html snapshots** for **each browser** instance. Also it comes with a beautifull angular based [HTML reporter for chat alike apps](https://github.com/azachar/screenshoter-report-analyzer).
 
 1. This plugin can take screenshots of each Jasmine2 expect success/failure on _multiple-browsers instances_ at once.
 2. It can take screenshots of each spec failure/success as well
@@ -23,12 +23,13 @@ This plugin captures for each **expectation** or **spec** console **logs** and m
 7. Supports parallel tests execution
 8. Makes optional Ascii screenshots
 9. Multi capabilities are supported
+10. For each expectation or spec can capture raw HTML for each browser instance
 
 Additional HTML reporter features:
 
 1. domain log filter (to narrow down your test classes faster)
 2. excludes certain repetitive logs
-
+3. opens for each screenshot its rendered HTML code
 
 ## Screenshots
 
@@ -162,6 +163,8 @@ exports.config = {
        package: 'protractor-screenshoter-plugin',
        screenshotOnExpect: {String}    (Default - 'failure+success', 'failure', 'none'),
        screenshotOnSpec: {String}    (Default - 'failure+success', 'failure', 'none'),
+       htmlOnExpect: {String}    (Default - 'failure', 'failure+success', 'none'),
+       htmlOnSpec: {String}    (Default - 'failure', 'failure+success', 'none'),
        withLogs: {Boolean}      (Default - true),
        htmlReport: {Boolean}      (Default - true),
        screenshotPath: {String}                (Default - '<reports/e2e>/screenshots')
@@ -260,31 +263,57 @@ If set to 'false', disables HTML report generation.
 
 **NOTE: This tool doesn't really make sense to use without the reports.**
 
-Default: 'true' Valid Options: true/false
+Default: 'true'
+
+Valid Options: true/false
 
 ## screenshotOnExpect
 
 Takes from each browser instance stored in global.screenshotBrowsers screenshots for each Jasmine2 expect failure or success, depending on value.
 
-Default: 'failure+success' Valid Options: 'failure+success'/'failure'/'none'
+Default: 'failure+success'
+
+Valid Options: 'failure+success'/'failure'/'none'
 
 ## screenshotOnSpec
 
 Takes from each browser instance stored in global.screenshotBrowsers screenshots for each Jasmine2 spec failure or success, depending on value.
 
-Default: 'failure' Valid Options: 'failure+success'/'failure'/'none'
+Default: 'failure+success'
+
+Valid Options: 'failure+success'/'failure'/'none'
+
+## htmlOnExpect
+
+Takes from each browser instance stored in global.screenshotBrowsers raw html for each Jasmine2 expect failure or success, depending on value.
+
+Default: 'failure'
+
+Valid Options: 'failure+success'/'failure'/'none'
+
+## htmlOnSpec
+
+Takes from each browser instance stored in global.screenshotBrowsers raw html for each Jasmine2 spec failure or success, depending on value.
+
+Default: 'failure'
+
+Valid Options: 'failure+success'/'failure'/'none'
 
 ## pauseOn
 
 If fails, pause browser on expectation failure or spec failure or never.
 
-Default: 'never' Valid Options: 'failure'/'spec'
+Default: 'never'
+
+Valid Options: 'failure'/'spec'
 
 ## verbose
 
 If set to ``debug`` display internal logging.
 
-Default: 'info' Valid Options: 'debug'/'info'
+Default: 'info'
+
+Valid Options: 'debug'/'info'
 
 ## imageToAscii
 
@@ -299,7 +328,9 @@ browser.skipImageToAscii = true;
 ```
 Then this browser instance will be not generated in the log file.
 
-Default: 'failure' Valid Options: 'failure+success'/'failure'/'none'
+Default: 'failure'
+
+Valid Options: 'failure+success'/'failure'/'none'
 
 To use this feature please follow instructions on <https://github.com/IonicaBizau/image-to-ascii/blob/master/INSTALLATION.md>
 
@@ -320,7 +351,9 @@ If set to 'true', capture from chrome all logs after each expect or spec
 
 _NOTE: This works only on chrome!_
 
-Default: 'true' Valid Options: true/false
+Default: 'true'
+
+Valid Options: true/false
 
 In order to make chrome' console works properly, you need to modify your `protractor.conf` as follows <https://github.com/webdriverio/webdriverio/issues/491#issuecomment-95510796>
 
@@ -328,7 +361,11 @@ In order to make chrome' console works properly, you need to modify your `protra
 
 By default, the output JSON file with tests results is written at the end of the execution of jasmine tests. However, for debug, process is better to get it immediately after each expectation - specify the option 'asap'. Also, there is a less usual option to write it after each test - use the option 'spec'. The recommended is to left it out for a CI server and for a local debugging use the option 'asap'.
 
-Default: 'end' Valid Options: 'asap', 'spec', 'end'
+Default: 'end'
+
+Valid Options: 'asap', 'spec', 'end'
+
+_NOTE: Using option ASAP might introduce unpredictable race conditions if multiple browsers are tested at once. It happens when we automatically collect results of all particulars JSON report files into one final.
 
 ## screenshotPath
 
@@ -469,7 +506,7 @@ git push --follow-tags origin master
 ```
 
 ## TODO
-
+- Refactor data structure of `report.js` 
+- 100% Test coverage
 - Convert to typescript based es6 npm plugin with a proper test infrastructure
 - Support Mocha framework
-- 100% Test coverage
