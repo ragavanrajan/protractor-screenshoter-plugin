@@ -119,7 +119,7 @@ protractorUtil.takeLogs = function(context, report) {
 protractorUtil.takeRawHtml = function(context, report) {
   function takeInstanceRawHtml(browserInstance, browserName, cb) {
     var snapshotFile = 'htmls/' + uuid.v1() + '.html';
-    protractorUtil.logDebug('Taking raw HTML ' + snapshotFile + ' from browser instance ' + browserName);
+    // protractorUtil.logDebug('Taking raw HTML ' + snapshotFile + ' from browser instance ' + browserName);
     var finalFile = context.config.screenshotPath + '/' + snapshotFile;
 
     browserInstance.getPageSource().then(function(html) {
@@ -361,7 +361,8 @@ protractorUtil.joinReports = function(context, done) {
       data.stat.pending += report.stat.pending || 0;
       data.stat.disabled += report.stat.disabled || 0;
     } catch (err) {
-      protractorUtil.logError('Unknown error while process report %s', reports[i]);
+      // need to refactor cb to promises + use promise all to avoid concurent writes and reads
+      // protractorUtil.logDebug('Unknown error while process report %s', reports[i]);
       return done(err);
     }
   }
