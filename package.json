@@ -10,7 +10,7 @@
     "test": "nyc jasmine",
     "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "testing": "TEST_COVERAGE_SKIP=true TEST_DEBUG=true jasmine",
-    "release": "standard-version"
+    "release": "node_modules/standard-version/bin/cli.js"
   },
   "nyc": {
     "include": [
