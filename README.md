@@ -295,61 +295,62 @@ Valid Options: `'failure+success'`/`'failure'`/`'none'`
 
 ## htmlReport
 
-If set to 'false', disables HTML report generation.
+If set to `false`, disables HTML report generation.
 
 **NOTE: This tool doesn't really make sense to use without the reports.**
 
-Default: 'true'
+Default: `true`
 
-Valid Options: true/false
+Valid Options:
+`true`/`false`
 
 ## screenshotOnExpect
 
 Takes from each browser instance stored in global.screenshotBrowsers screenshots for each Jasmine2 expect failure or success, depending on value.
 
-Default: 'failure+success'
+Default: `'failure+success'`
 
-Valid Options: 'failure+success'/'failure'/'none'
+Valid Options: `'failure+success'`/`'failure'`/`'none'`
 
 ## screenshotOnSpec
 
 Takes from each browser instance stored in global.screenshotBrowsers screenshots for each Jasmine2 spec failure or success, depending on value.
 
-Default: 'failure+success'
+Default: `failure+success`
 
-Valid Options: 'failure+success'/'failure'/'none'
+Valid Options: `'failure+success'`/`'failure'`/`'none'`
 
 ## htmlOnExpect
 
 Takes from each browser instance stored in global.screenshotBrowsers raw html for each Jasmine2 expect failure or success, depending on value.
 
-Default: 'failure'
+Default: `'failure'`
 
-Valid Options: 'failure+success'/'failure'/'none'
+Valid Options: `'failure+success'`/`'failure'`/`'none'`
 
 ## htmlOnSpec
 
 Takes from each browser instance stored in global.screenshotBrowsers raw html for each Jasmine2 spec failure or success, depending on value.
 
-Default: 'failure'
+Default: `'failure'`
 
-Valid Options: 'failure+success'/'failure'/'none'
+Valid Options: `'failure+success'`/`'failure'`/`'none'`
 
 ## pauseOn
 
 If fails, pause browser on expectation failure or spec failure or never.
 
-Default: 'never'
+Default: `'never'`
 
-Valid Options: 'failure'/'spec'
+Valid Options: `'failure'`/`'spec'`
 
 ## verbose
 
 If set to ``debug`` display internal logging.
 
-Default: 'info'
+Default: `'info'`
 
-Valid Options: 'debug'/'info'
+Valid Options: `'debug'`/`'info'`
 
 ## imageToAscii
 
@@ -364,9 +365,9 @@ browser.skipImageToAscii = true;
 ```
 Then this browser instance will be not generated in the log file.
 
-Default: 'failure'
+Default: `'failure'`
 
-Valid Options: 'failure+success'/'failure'/'none'
+Valid Options: `'failure+success'`/`'failure'`/`'none'`
 
 To use this feature please follow instructions on <https://github.com/IonicaBizau/image-to-ascii/blob/master/INSTALLATION.md>
 
@@ -383,13 +384,13 @@ Default: ``{bg:true}``
 
 ## withLogs (Chrome only)
 
-If set to 'true', capture from chrome all logs after each expect or spec
+If set to `true`, capture from chrome all logs after each expect or spec
 
 _NOTE: This works only on chrome!_
 
-Default: 'true'
+Default: `true`
 
-Valid Options: true/false
+Valid Options: `true`/`false`
 
 In order to make chrome' console works properly, you need to modify your `protractor.conf` as follows <https://github.com/webdriverio/webdriverio/issues/491#issuecomment-95510796>
 
@@ -397,25 +398,25 @@ In order to make chrome' console works properly, you need to modify your `protra
 
 By default, the output JSON file with tests results is written at the end of the execution of jasmine tests. However, for debug, process is better to get it immediately after each expectation - specify the option 'asap'. Also, there is a less usual option to write it after each test - use the option 'spec'. The recommended is to left it out for a CI server and for a local debugging use the option 'asap'.
 
-Default: 'end'
+Default: `'end'`
 
-Valid Options: 'asap', 'spec', 'end'
+Valid Options: `'asap'`, `'spec'`, `'end'`
 
 _NOTE: Using option ASAP might introduce unpredictable race conditions if multiple browsers are tested at once. It happens when we automatically collect results of all particulars JSON report files into one final.
 
 ## screenshotPath
 
-The path where the final report including screenshots will be saved. If the path does not exist, will be created. e.g './reports/something/samewhere/', please take care of './' and '/' at the beginning and end.
+The path where the final report including screenshots will be saved. If the path does not exist, will be created. e.g `./reports/something/samewhere/`, please take care of `./` and `/` at the beginning and end.
 
 Please note that due to an HTML reporter sugar, the final screenshots are stored in the subfolder relative to this $screenshotPath parameter, e.g. in the folder `$screenshotPath/screenshots'`
 
-Default: 'reports/e2e'
+Default: `'reports/e2e'`
 
 ## clearFoldersBeforeTest
 
 If this flag set to true, screenshot and HTML report directories will be emptied before generating new reports and screenshots
 
-Default: false
+Default: `false`
 
 ## failTestOnErrorLog (Chrome only)
 
@@ -427,7 +428,7 @@ _NOTE: This works only on chrome!_
 
 Log level, the test fails of the browser console log has logs **more than** this specified level.
 
-Default: 900
+Default: `900`
 
 ### excludeKeywords
 
@@ -542,7 +543,12 @@ git push --follow-tags origin master
 ```
 
 ## TODO
-- Refactor data structure of `report.js`
+- Use promises instead of callbacks
+   - Refactor `asap/spec/end` report writing at the end of each promise.all, instead of after each callback
+- Get rid of workaround for long-running operations
+   - Make a command line tool to collect particular json reports and to combine them into to the final `report.js` to avoid race conditions with multi snapshots/protractor/browsers instances writing to the same `report.js` or reading from unfinished particular report json to produce `report.js`.
+- Refactor data structure of `report.js` (breaking change)
+   - Get rid of spec and expect duality (needs to be refactored the reporter plugin too)
 - 100% Test coverage
 - Convert to typescript based es6 npm plugin with a proper test infrastructure
 - Support Mocha framework
