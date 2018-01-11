@@ -1,6 +1,6 @@
 {
   "name": "protractor-screenshoter-plugin",
-  "version": "0.7.0",
+  "version": "0.9.0",
   "description": "A jasmine2 protractor plugin that captures for each browser instance a screenshot and browsers' console logs. The snapshot is made optionally for each expect or spec. Plugins comes with a beautiful angular based analytics tool to visually check and fix tests results.",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "test": "nyc jasmine",
     "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "testing": "TEST_COVERAGE_SKIP=true TEST_DEBUG=true jasmine",
-    "release": "standard-version"
+    "release": "node_modules/standard-version/bin/cli.js"
   },
   "nyc": {
     "include": [
@@ -55,7 +55,7 @@
     "mkdirp": "^0.5.1",
     "moment": "^2.20.1",
     "q": "^1.5.1",
-    "screenshoter-report-analyzer": "^0.3.0",
+    "screenshoter-report-analyzer": "^0.5",
     "uuid": "^3.1.0"
   },
   "devDependencies": {
