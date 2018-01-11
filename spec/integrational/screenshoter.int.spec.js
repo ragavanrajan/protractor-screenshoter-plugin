@@ -1375,4 +1375,132 @@ describe("Screenshoter running under protractor", function() {
       });
     });
   });
+
+  describe("dump", function() {
+    beforeAll(function() {
+      runProtractorWithConfig('dump.js');
+    });
+
+    it("should generate report.js with extra dump strings for each expectations", function(done) {
+      fs.readFile('.tmp/dump/report.js', 'utf8', function(err, data) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(data).toContain("angular.module('reporter').constant('data'");
+
+        var report = getReportAsJson(data);
+        expect(report.tests.length).toBe(1);
+        expect(report.tests[0].passedExpectations[0].dump).toContain('extra data captured at');
+        expect(report.tests[0].failedExpectations[0].dump).toContain('extra data captured at');
+        expect(report.tests[0].specDump).toContain('extra data captured at');
+        //each dump is different
+        expect(report.tests[0].failedExpectations[0].dump).not.toBe(report.tests[0].passedExpectations[0].dump);
+        expect(report.tests[0].specDump).not.toBe(report.tests[0].failedExpectations[0].dump);
+        expect(report.tests[0].specDump).not.toBe(report.tests[0].passedExpectations[0].dump);
+        done();
+      });
+    });
+
+  });
+
+  describe("dump with callback", function() {
+    beforeAll(function() {
+      runProtractorWithConfig('dump-cb.js');
+    });
+
+    it("should generate report.js with extra dump strings for each expectations", function(done) {
+      fs.readFile('.tmp/dump-cb/report.js', 'utf8', function(err, data) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(data).toContain("angular.module('reporter').constant('data'");
+
+        var report = getReportAsJson(data);
+        expect(report.tests.length).toBe(1);
+        expect(report.tests[0].passedExpectations[0].dump).toContain('extra data captured at');
+        expect(report.tests[0].failedExpectations[0].dump).toContain('extra data captured at');
+        expect(report.tests[0].specDump).toContain('extra data captured at');
+        //each dump is different
+        expect(report.tests[0].failedExpectations[0].dump).not.toBe(report.tests[0].passedExpectations[0].dump);
+        expect(report.tests[0].specDump).not.toBe(report.tests[0].failedExpectations[0].dump);
+        expect(report.tests[0].specDump).not.toBe(report.tests[0].passedExpectations[0].dump);
+        done();
+      });
+    });
+
+  });
+  describe("dump with callback for asap", function() {
+    beforeAll(function() {
+      runProtractorWithConfig('dump-cb-asap.js');
+    });
+
+    it("should generate report.js with extra dump strings for each expectations", function(done) {
+      fs.readFile('.tmp/dump-cb-asap/report.js', 'utf8', function(err, data) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(data).toContain("angular.module('reporter').constant('data'");
+
+        var report = getReportAsJson(data);
+        expect(report.tests.length).toBe(1);
+        expect(report.tests[0].passedExpectations[0].dump).toContain('extra data captured at');
+        expect(report.tests[0].failedExpectations[0].dump).toContain('extra data captured at');
+        expect(report.tests[0].specDump).toContain('extra data captured at');
+        //each dump is different
+        expect(report.tests[0].failedExpectations[0].dump).not.toBe(report.tests[0].passedExpectations[0].dump);
+        expect(report.tests[0].specDump).not.toBe(report.tests[0].failedExpectations[0].dump);
+        expect(report.tests[0].specDump).not.toBe(report.tests[0].passedExpectations[0].dump);
+        done();
+      });
+    });
+
+  });
+  describe("dump with callback for spec", function() {
+    beforeAll(function() {
+      runProtractorWithConfig('dump-cb-spec.js');
+    });
+
+    it("should generate report.js with extra dump strings for each expectations", function(done) {
+      fs.readFile('.tmp/dump-cb-spec/report.js', 'utf8', function(err, data) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(data).toContain("angular.module('reporter').constant('data'");
+
+        var report = getReportAsJson(data);
+        expect(report.tests.length).toBe(1);
+        expect(report.tests[0].passedExpectations[0].dump).toContain('extra data captured at');
+        expect(report.tests[0].failedExpectations[0].dump).toContain('extra data captured at');
+        expect(report.tests[0].specDump).toContain('extra data captured at');
+        //each dump is different
+        expect(report.tests[0].failedExpectations[0].dump).not.toBe(report.tests[0].passedExpectations[0].dump);
+        expect(report.tests[0].specDump).not.toBe(report.tests[0].failedExpectations[0].dump);
+        expect(report.tests[0].specDump).not.toBe(report.tests[0].passedExpectations[0].dump);
+        done();
+      });
+    });
+
+  });
+  describe("dump with callback with default configuration", function() {
+    beforeAll(function() {
+      runProtractorWithConfig('dump-cb-on-default.js');
+    });
+
+    it("should generate report.js with extra dump strings for each failed expectations and nothing for spec", function(done) {
+      fs.readFile('.tmp/dump-cb-on-default/report.js', 'utf8', function(err, data) {
+        if (err) {
+          return done.fail(err);
+        }
+        expect(data).toContain("angular.module('reporter').constant('data'");
+
+        var report = getReportAsJson(data);
+        expect(report.tests.length).toBe(1);
+        expect(report.tests[0].passedExpectations[0].dump).toBeUndefined();
+        expect(report.tests[0].failedExpectations[0].dump).toContain('extra data captured at');
+        expect(report.tests[0].specDump).toBeUndefined();
+        done();
+      });
+    });
+
+  });
 });

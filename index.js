@@ -50,6 +50,21 @@ protractorUtil.logDebug = function() {};
 protractorUtil.logInfo = console.info;
 protractorUtil.logError = console.error;
 
+protractorUtil.takeDump = function(context, done) {
+  if (context.config.dump) {
+    try {
+      var result = context.config.dump(function(err, result1) {
+        done(result1);
+      });
+      if (result) {
+        return done(result);
+      }
+    } catch (err) {
+      protractorUtil.logError('Unable to execute spec\'s dump', err);
+      done();
+    }
+  }
+}
 protractorUtil.forEachBrowser = function(action) {
   function catchError(err) {
     console.warn('Unknown error:');
@@ -162,20 +177,31 @@ protractorUtil.takeScreenshotOnExpectDone = function(context) {
     var makeScreenshotsFromEachBrowsers = false;
     var makeAsciiLog = false;
     var makeHtmlSnapshot = false;
+    var makeDump = false;
     if (protractorUtil.test) {
       if (passed) {
         protractorUtil.test.passedExpectations.push(expectation);
         makeScreenshotsFromEachBrowsers = context.config.screenshotOnExpect === 'failure+success';
         makeAsciiLog = context.config.imageToAscii === 'failure+success';
         makeHtmlSnapshot = context.config.htmlOnExpect === 'failure+success';
+        makeDump = context.config.dumpOnExpect === 'failure+success';
       } else {
         protractorUtil.test.failedExpectations.push(expectation);
         makeScreenshotsFromEachBrowsers = context.config.screenshotOnExpect === 'failure+success' || context.config.screenshotOnExpect === 'failure';
         makeAsciiLog = context.config.imageToAscii === 'failure+success' || context.config.imageToAscii === 'failure';
         makeHtmlSnapshot = context.config.htmlOnExpect === 'failure+success' || context.config.htmlOnExpect === 'failure';
+        makeDump = context.config.dumpOnExpect === 'failure+success' || context.config.dumpOnExpect === 'failure';
       }
     } else {
       console.warn('Calling addExpectationResult before specStarted!');
+    }
+    if (makeDump) {
+      protractorUtil.takeDump(context, function(dump) {
+        expectation.dump = dump;
+        if (context.config.writeReportFreq === 'asap') {
+          protractorUtil.writeReport(context, protractorUtil.newLongRunningOperationCounter());
+        }
+      });
     }
     if (makeScreenshotsFromEachBrowsers) {
       protractorUtil.takeScreenshot(context, function(filename, browserName, finalFile, browserInstance, done) {
@@ -184,6 +210,7 @@ protractorUtil.takeScreenshotOnExpectDone = function(context) {
           browser: browserName,
           when: new Date()
         });
+
         if (makeAsciiLog && !browserInstance.skipImageToAscii) {
           try {
             imageToAscii(finalFile, context.config.imageToAsciiOpts, function(err, converted) {
@@ -244,16 +271,28 @@ protractorUtil.takeOnSpecDone = function(result, context, test) {
 
   var makeScreenshotsFromEachBrowsers = false;
   var makeHtmlSnapshot = false;
+  var makeDump = false;
   if (result.failedExpectations.length === 0) {
     makeScreenshotsFromEachBrowsers = context.config.screenshotOnSpec === 'failure+success';
     makeHtmlSnapshot = context.config.htmlOnSpec === 'failure+success';
+    makeDump = context.config.dumpOnSpec === 'failure+success';
   } else {
     makeScreenshotsFromEachBrowsers = context.config.screenshotOnSpec === 'failure+success' || context.config.screenshotOnSpec === 'failure';
     makeHtmlSnapshot = context.config.htmlOnSpec === 'failure+success' || context.config.htmlOnSpec === 'failure';
+    makeDump = context.config.dumpOnSpec === 'failure+success' || context.config.dumpOnSpec === 'failure';
   }
   if (result.status === 'disabled' || result.status === 'pending') {
     makeScreenshotsFromEachBrowsers = false;
     makeHtmlSnapshot = false;
+    makeDump = false;
+  }
+  if (makeDump) {
+    protractorUtil.takeDump(context, function(dump) {
+      test.specDump = dump;
+      if (context.config.writeReportFreq === 'asap' || context.config.writeReportFreq === 'spec') {
+        protractorUtil.writeReport(context, protractorUtil.newLongRunningOperationCounter());
+      }
+    });
   }
   if (makeScreenshotsFromEachBrowsers) {
     protractorUtil.takeScreenshot(context, function(file, browserName, finalFile, browserInstance, done) {
@@ -268,6 +307,8 @@ protractorUtil.takeOnSpecDone = function(result, context, test) {
         done();
       }
     });
+
+
   }
 
   if (makeHtmlSnapshot) {
@@ -526,14 +567,17 @@ protractorUtil.prototype.setup = function() {
     withLogs: true,
     screenshotOnExpect: 'failure+success',
     htmlOnExpect: 'failure',
+    dumpOnExpect: 'failure',
     verbose: 'info',
     screenshotOnSpec: 'failure+success',
     htmlOnSpec: 'failure',
+    dumpOnSpec: 'none',
     pauseOn: 'never',
     imageToAscii: 'none',
     imageToAsciiOpts: {
       bg: true
     },
+    dump: null,
     htmlReport: true,
     writeReportFreq: 'end'
   }

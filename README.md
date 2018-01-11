@@ -180,6 +180,9 @@ exports.config = {
                 suites: {A JSON Array}
            }
        }],
+       dumpOnExpect: {String}    (Default - 'failure', 'failure+success', 'none'),
+       dumpOnSpec: {String}    (Default - 'none', 'failure+success', 'failure'),
+       dump: {Function} (Default - null),
        onPrepare: function () {
         // returning the promise makes protractor wait for the reporter config before executing tests
         return global.browser.getProcessedConfig().then(function (config) {
@@ -256,6 +259,39 @@ If there is a failure (based on the config) it creates also an ASCII image into 
 
 
 # Config reference
+
+## dump
+If set a function, allows you to run extra command that produce a dump. The dump is taken depending on value in [dumpOnSpec](#dumponspec) or [dumpOnExpect](#dumponexpect).
+
+This allows you to greater examine your failed expectation/spec from multiple perspectives,
+
+one is a screenshot (unfortunately selenium cannot make a whole page screenshot, only what is in the visible browser's window),
+
+the second is a whole page raw HTML  ( this helps to overcome limitations in seeing only screenshots)
+
+and the third could be for example a DB dump that is all nicely linked to expectations.
+
+_Note_: Implementation of the **dump function** is up to you, you provide any function that **must return a string** directly or in a `callback(err, dumpString)`.
+
+Default: `null`
+
+Valid Options: `null` / `Function`
+
+## dumpOnExpect
+
+Calls the `dump` function for each Jasmine2 expect failure or success, depending on value.
+
+Default: `'failure'`
+
+Valid Options: `'failure+success'`/`'failure'`/`'none'`
+
+## dumpOnSpec
+
+Calls the `dump` function for each Jasmine2 spec failure or success, depending on value.
+
+Default: `none`
+
+Valid Options: `'failure+success'`/`'failure'`/`'none'`
 
 ## htmlReport
 
@@ -506,7 +542,7 @@ git push --follow-tags origin master
 ```
 
 ## TODO
-- Refactor data structure of `report.js` 
+- Refactor data structure of `report.js`
 - 100% Test coverage
 - Convert to typescript based es6 npm plugin with a proper test infrastructure
 - Support Mocha framework
