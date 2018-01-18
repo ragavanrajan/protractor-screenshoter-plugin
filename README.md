@@ -13,18 +13,26 @@
 
 # protractor-screenshoter-plugin
 
-This plugin captures for each **expectation** or **spec** console **logs** and makes **screenshots** and **raw html snapshots** for **each browser** instance. Also it comes with a beautifull angular based [HTML reporter for chat alike apps](https://github.com/azachar/screenshoter-report-analyzer).
+**It captures screenshots, console logs, raw HTMLs and DB dumps in your e2e protractor tests out-of-box.**
 
-1. This plugin can take screenshots of each Jasmine2 expect success/failure on _multiple-browsers instances_ at once.
-2. It can take screenshots of each spec failure/success as well
-3. For each expectation or spec can capture console logs for each browser instance
-4. It can generate a report analyzer - angular+bootstrap HTML reports with active filtering to easily find out why your tests are failing
-5. HTML reports allow you to analyze your browser's console logs as well.
-6. Supports gitlab.com CI/CD, circleci.com (the report displays a build number, a branch, etc. )
+**All is then visualized in a beautiful [HTML5 report analyzer](https://github.com/azachar/screenshoter-report-analyzer).**
+
+**We support multi capabilities and multi browsers instances, too.**
+
+## Features
+
+1. This plugin can take screenshots of each **Jasmine2** expect **success/failure** on _multiple-browsers instances_ at once.
+2. It can take **screenshots** of each **spec** failure/success as well
+3. For each **expectation** or spec can capture console logs for **each browser instance**
+4. It can generate a report analyzer - angular+bootstrap **HTML reports** with active filtering to easily find out why your tests are failing
+5. HTML reports allow you to analyze your browser's **console logs** as well.
+6. Supports gitlab.com **CI/CD**, circleci.com (the report displays a build number, a branch, etc. )
 7. Supports parallel tests execution
-8. Makes optional Ascii screenshots
-9. Multi capabilities are supported
-10. For each expectation or spec can capture raw HTML for each browser instance
+8. Makes optional **Ascii** screenshots
+9. **Multi capabilities** are supported
+10. For each expectation or spec can capture **raw HTML** for each browser instance
+11. For each expectation or spec can obtain a **DB dump** via a function returning ``callback(err, dumpAsString)``
+
 
 Additional HTML reporter features:
 
