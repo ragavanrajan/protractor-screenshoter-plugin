@@ -405,7 +405,7 @@ In order to make chrome' console works properly, you need to modify your `protra
 
 ## writeReportFreq
 
-By default, the output JSON file with tests results is written at the end of the execution of jasmine tests. However, for debug, process is better to get it immediately after each expectation - specify the option 'asap'. Also, there is a less usual option to write it after each test - use the option 'spec'. The recommended is to left it out for a CI server and for a local debugging use the option 'asap'.
+By default, the output JSON file with tests results is written at the end of the execution of jasmine tests. However, for debugging, is better to get it written immediately after each expectation - specify the option 'asap'. Also, there is a less usual option to write it after each test - use the option 'spec'. The recommended is to left it out for a CI server and for a local debugging use the option 'asap'.
 
 Default: `'end'`
 
@@ -453,111 +453,4 @@ Please do not specify this flag, if you want all your tests to run through this 
 
 # Development
 
-After cloning the project you can run tests as follows:
-
-1. `npm install`
-2. `npm run setup`
-3. `npm run server &`
-4. `npm test`
-
-To run without coverage report including some debug logging use  `npm run testing`
-
-
-## Committing
-Please use `git-cz` to format your commit message.
-
-Before committing, please check your changes with
-```
-npm run lint
-```
-and fix your code style issues.
-
-## Contributing
-- Your PR is more than welcome!
-- Please include always tests in your PR.
-- If you find a bug, please create a test case for it that fails first, then write your fix. If all passes on Travis, feel free to provide PR.
-
-### How to write tests for your contribution
-
-We are testing our plugin for protractor,
-
-1. so we need an e2e protractor test.
-
-  There are already some e2e tests in ``spec/integrational/protractor`` that can be reused. Basically, we run sample e2e tests against http://www.angularjs.org. So if this page is changed or inaccessible our tests will fail too :(
-
-  ***Note***: *Any PR that will create a local dummy server that our sample tests will run against is welcome :)*
-
-2. Then we need a screenshoter configuration that we will run the protractor e2e tests against. Please write your new config in
-``spec/integrational/protractor-config\bugXXX.js``
-
-3. Please always specify a unique directory for your new screenshoter config, so it doesn't interfere with the existing tests.
-
-  ```js
-  var env = require('../environment');
-
-  exports.config = {
-      seleniumAddress: env.seleniumAddress,
-      framework: 'jasmine2',
-      specs: ['../protractor/angularjs-homepage-test.js'],
-      plugins: [{
-          path: '../../../index.js',
-
-          screenshotPath: '.tmp/bugXXX',
-      }]
-  };
-  ```
-
-4. write your jasmine test (copy the whole describe block from existing one and modify it to your needs).
-
-  Mainly modify
-  ```js
-    beforeAll(function() {
-        runProtractorWithConfig('bugXXX.js');
-    });
-  ```
-
-To check results from protractor e2e tests, simply run
-
-```
-node_modules/protractor/bin/protractor spec/integrational/protractor-config/bugXXX.js
-```
-
-Then you can tweak your jasmine test to check the correct behavior of your screenshoter bugfix or feature.
-
-5. to run jasmine tests use  `npm test` after
-  1. `npm install`
-  2. `npm run setup` This will install webdriver
-  3. `npm run server &` This will run selenium server
-
-### How to debug screenshoter plugin
-
-You can debug this plugin by running protractor in a debug mode like this:
-```
- node --inspect-brk node_modules/protractor/bin/protractor ./spec/integrational/protractor-config/default.js
-```
-**NOTE**
-  Where `./spec/integrational/protractor-config/default.js` is a sample e2e test. You can choose another one or write one yourself.
-
-Then open ``chrome://inspect`` in your Chrome and press `inspect` on the remote target.
-
-Here is more information how to debug protractor - https://github.com/angular/protractor/blob/master/docs/debugging.md
-
-### Releasing
-
-To deploy a new version run commands. If all tests are passed it will be published to npm on its own.
-
-```
-npm run release
-git push --follow-tags origin master
-```
-
-## TODO
-- Use promises instead of callbacks
-   - Refactor `asap/spec/end` report writing at the end of each promise.all, instead of after each callback
-- Get rid of workaround for long-running operations
-   - Make a command line tool to collect particular json reports and to combine them into to the final `report.js` to avoid race conditions with multi snapshots/protractor/browsers instances writing to the same `report.js` or reading from unfinished particular report json to produce `report.js`.
-- Refactor data structure of `report.js` (breaking change)
-   - Get rid of spec and expect duality (needs to be refactored the reporter plugin too)
-- 100% Test coverage
-- Convert to typescript based es6 npm plugin with a proper test infrastructure
-- Support Mocha framework
+Please follow [CONTRIBUTING.md](https://github.com/azachar/protractor-screenshoter-plugin/blob/master/CONTRIBUTING.md).
