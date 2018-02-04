@@ -26,7 +26,7 @@
 3. For each **expectation** or spec can capture console logs for **each browser instance**
 4. It can generate a report analyzer - angular+bootstrap **HTML reports** with active filtering to easily find out why your tests are failing
 5. HTML reports allow you to analyze your browser's **console logs** as well.
-6. Supports gitlab.com **CI/CD**, circleci.com (the report displays a build number, a branch, etc. )
+6. Supports extracting build information (the report displays a build number, a branch, etc. ) for [GitLab](https://gitlab.com) **CI/CD**, [CircleCI](https://circleci.com) and [Travis](https://travis-ci.org/).
 7. Supports parallel tests execution
 8. Makes optional **Ascii** screenshots
 9. **Multi capabilities** are supported
@@ -268,6 +268,24 @@ If there is a failure (based on the config) it creates also an ASCII image into 
 
 
 # Config reference
+
+## Environmental variables
+
+Screenshoter out-of-box obtains build information. However, some CI does not have an environmental variable for a commit message. Thus you need to obtain it manually:
+
+**GitLab**
+```sh
+   export CI_COMMIT_MSG=$(git log -1 --pretty=%B)
+```
+
+**CircleCI**
+```sh
+   export CIRCLE_MSG=$(git log -1 --pretty=%B)
+```
+
+If CI will support one day these variables, you won't need to enter anything in your build process.
+
+Do you want to see exactly what is extracted, consult the code directly [obtainCIVariables](index.js#L551)
 
 ## dump
 If set a function, allows you to run extra command that produce a dump. The dump is taken depending on value in [dumpOnSpec](#dumponspec) or [dumpOnExpect](#dumponexpect).
