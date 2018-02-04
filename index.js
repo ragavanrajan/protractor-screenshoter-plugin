@@ -369,14 +369,6 @@ protractorUtil.joinReports = function(context, done) {
     nodir: true
   });
 
-  var ci = {
-    build: process.env.CI_JOB_ID || process.env.CIRCLE_BUILD_NUM || 'N/A',
-    branch: process.env.CI_COMMIT_REF_NAME || process.env.CIRCLE_BRANCH || 'N/A',
-    sha: process.env.CI_COMMIT_SHA || process.env.CIRCLE_SHA1 || 'N/A',
-    tag: process.env.CI_COMMIT_TAG || process.env.CIRCLE_TAG || 'N/A',
-    name: process.env.CI_PROJECT_PATH || process.env.CIRCLE_PROJECT_REPONAME || 'N/A'
-  };
-
   var data = {
     tests: [],
     stat: {
@@ -385,7 +377,7 @@ protractorUtil.joinReports = function(context, done) {
       pending: 0,
       disabled: 0
     },
-    ci: ci,
+    ci: context.ci,
     generatedOn: new Date()
   };
 
@@ -556,7 +548,42 @@ protractorUtil.failTestOnErrorLog = function(context) {
     });
   });
 };
-
+protractorUtil.prototype.obtainCIVariables = function(env) {
+  if (env.GITLAB_CI) {
+    return {
+      build: env.CI_JOB_ID,
+      branch: env.CI_COMMIT_REF_NAME,
+      sha: env.CI_COMMIT_SHA,
+      tag: env.CI_COMMIT_TAG,
+      name: env.CI_PROJECT_PATH,
+      commit: env.CI_COMMIT_MSG,
+      url: env.CI_PROJECT_URL + '/-/jobs/' + env.CI_JOB_ID
+    }
+  }
+  if (env.CIRCLECI) {
+    return {
+      build: env.CIRCLE_BUILD_NUM,
+      branch: env.CIRCLE_BRANCH,
+      sha: env.CIRCLE_SHA1,
+      tag: env.CIRCLE_TAG,
+      name: env.CIRCLE_PROJECT_REPONAME,
+      commit: env.CIRCLE_MSG,
+      url: env.CIRCLE_BUILD_URL
+    }
+  }
+  if (env.TRAVIS) {
+    return {
+      build: env.TRAVIS_JOB_NUMBER,
+      branch: env.TRAVIS_BRANCH,
+      sha: env.TRAVIS_COMMIT,
+      tag: env.TRAVIS_TAG,
+      name: env.TRAVIS_REPO_SLUG,
+      commit: env.TRAVIS_COMMIT_MESSAGE,
+      url: 'https://travis-this.ci.org/' + env.TRAVIS_REPO_SLUG + '/builds/' + env.TRAVIS_BUILD_ID
+    }
+  }
+  return {};
+}
 /**
  * Initialize configuration
  */
@@ -581,6 +608,8 @@ protractorUtil.prototype.setup = function() {
     htmlReport: true,
     writeReportFreq: 'end'
   }
+
+  this.ci = this.obtainCIVariables(process.env);
 
   this.config = _.merge({}, defaultSettings, this.config);
   this.config.reportFile = this.config.screenshotPath + '/reports/' + uuid.v1() + '.js';
