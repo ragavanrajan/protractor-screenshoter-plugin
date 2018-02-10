@@ -67,9 +67,6 @@
     "protractor": "^5.x",
     "standard-version": "^4.2.0"
   },
-  "optionalDependencies": {
-    "image-to-ascii": "^3.0.11"
-  },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"

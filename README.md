@@ -124,9 +124,9 @@ as mentioned in #37.
   choco install graphicsmagick
 ```
 
-  Then, install this package
+  Then, install this optional package
 ```sh
-  npm install image-to-ascii
+  npm install image-to-ascii@3.0.11
 ```
 
 # Experimental features
