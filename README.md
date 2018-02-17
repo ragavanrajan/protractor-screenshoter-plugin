@@ -1,4 +1,5 @@
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/protractor-screenshoter-plugin/Lobby)
+[![Open Source Helpers](https://www.codetriage.com/azachar/protractor-screenshoter-plugin/badges/users.svg)](https://www.codetriage.com/azachar/protractor-screenshoter-plugin)
 
 [![npm](https://img.shields.io/npm/dm/protractor-screenshoter-plugin.svg?style=flat-square)](https://www.npmjs.com/package/protractor-screenshoter-plugin) [![npm](https://img.shields.io/npm/dt/protractor-screenshoter-plugin.svg?style=flat-square)](https://www.npmjs.com/package/protractor-screenshoter-plugin)
 
