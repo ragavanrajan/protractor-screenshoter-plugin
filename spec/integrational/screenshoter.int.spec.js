@@ -104,6 +104,8 @@ describe("Screenshoter running under protractor", function() {
         expect(report.ci.sha).toBeDefined();
         expect(report.ci.branch).toBeDefined();
         expect(report.ci.name).toBeDefined();
+        expect(report.ci.commit).toBeDefined();
+        expect(report.ci.url).toBeDefined();
 
         expect(report.tests.length).toBe(3);
         expect(report.tests[0].specLogs.length).toBe(0);
@@ -272,6 +274,8 @@ describe("Screenshoter running under protractor", function() {
         expect(report.ci.sha).toBeDefined();
         expect(report.ci.branch).toBeDefined();
         expect(report.ci.name).toBeDefined();
+        expect(report.ci.commit).toBeDefined();
+        expect(report.ci.url).toBeDefined();
 
         expect(report.tests.length).toBe(3);
         expect(report.tests[0].specScreenshots.length).toBe(0);
@@ -373,6 +377,8 @@ describe("Screenshoter running under protractor", function() {
         expect(report.ci.sha).toBeDefined();
         expect(report.ci.branch).toBeDefined();
         expect(report.ci.name).toBeDefined();
+        expect(report.ci.commit).toBeDefined();
+        expect(report.ci.url).toBeDefined();
 
         expect(report.tests.length).toBe(3);
         expect(report.tests[0].specLogs.length).toBe(0);
@@ -467,6 +473,8 @@ describe("Screenshoter running under protractor", function() {
         expect(report.ci.sha).toBeDefined();
         expect(report.ci.branch).toBeDefined();
         expect(report.ci.name).toBeDefined();
+        expect(report.ci.commit).toBeDefined();
+        expect(report.ci.url).toBeDefined();
 
         expect(report.tests.length).toBe(2);
         expect(report.tests[0].specLogs.length).toBe(0);
@@ -705,6 +713,8 @@ describe("Screenshoter running under protractor", function() {
         expect(report.ci.sha).toBeDefined();
         expect(report.ci.branch).toBeDefined();
         expect(report.ci.name).toBeDefined();
+        expect(report.ci.commit).toBeDefined();
+        expect(report.ci.url).toBeDefined();
 
         expect(report.tests.length).toBe(2);
         expect(report.tests[0].specLogs.length).toBe(0);
@@ -760,6 +770,8 @@ describe("Screenshoter running under protractor", function() {
         expect(report.ci.sha).toBeDefined();
         expect(report.ci.branch).toBeDefined();
         expect(report.ci.name).toBeDefined();
+        expect(report.ci.commit).toBeDefined();
+        expect(report.ci.url).toBeDefined();
 
         expect(report.tests.length).toBe(1);
         expect(report.tests[0].specLogs.length).toBe(0);
@@ -846,6 +858,8 @@ describe("Screenshoter running under protractor", function() {
         expect(report.ci.sha).toBeDefined();
         expect(report.ci.branch).toBeDefined();
         expect(report.ci.name).toBeDefined();
+        expect(report.ci.commit).toBeDefined();
+        expect(report.ci.url).toBeDefined();
 
         expect(report.tests.length).toBe(1);
         expect(report.tests[0].specLogs.length).toBe(0);
@@ -970,6 +984,8 @@ describe("Screenshoter running under protractor", function() {
         expect(report.ci.sha).toBeDefined();
         expect(report.ci.branch).toBeDefined();
         expect(report.ci.name).toBeDefined();
+        expect(report.ci.commit).toBeDefined();
+        expect(report.ci.url).toBeDefined();
 
         expect(report.tests.length).toBe(2);
         expect(report.tests[0].specLogs.length).toBe(0);
@@ -1060,6 +1076,8 @@ describe("Screenshoter running under protractor", function() {
         expect(report.ci.sha).toBeDefined();
         expect(report.ci.branch).toBeDefined();
         expect(report.ci.name).toBeDefined();
+        expect(report.ci.commit).toBeDefined();
+        expect(report.ci.url).toBeDefined();
 
         expect(report.tests.length).toBe(2);
         expect(report.tests[0].specLogs.length).toBe(0);
@@ -1130,6 +1148,8 @@ describe("Screenshoter running under protractor", function() {
         expect(report.ci.sha).toBeDefined();
         expect(report.ci.branch).toBeDefined();
         expect(report.ci.name).toBeDefined();
+        expect(report.ci.commit).toBeDefined();
+        expect(report.ci.url).toBeDefined();
 
         expect(report.tests.length).toBe(6);
         expect(report.tests[0].specLogs.length).toBe(0);
@@ -1238,6 +1258,8 @@ describe("Screenshoter running under protractor", function() {
         expect(report.ci.sha).toBeDefined();
         expect(report.ci.branch).toBeDefined();
         expect(report.ci.name).toBeDefined();
+        expect(report.ci.commit).toBeDefined();
+        expect(report.ci.url).toBeDefined();
 
         expect(report.tests.length).toBe(2);
         expect(report.tests[0].specLogs.length).toBe(0);

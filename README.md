@@ -5,6 +5,7 @@
 [![npm](https://img.shields.io/npm/v/protractor-screenshoter-plugin.svg?style=flat-square)](https://www.npmjs.com/package/protractor-screenshoter-plugin) [![npm](https://img.shields.io/npm/l/protractor-screenshoter-plugin.svg?style=flat-square)](https://www.npmjs.com/package/protractor-screenshoter-plugin) [![Semver](http://img.shields.io/SemVer/2.0.0.png)](http://semver.org/spec/v2.0.0.html) [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
 [![Dependency Status](https://david-dm.org/azachar/protractor-screenshoter-plugin.svg)](https://david-dm.org/azachar/protractor-screenshoter-plugin) [![devDependency Status](https://david-dm.org/azachar/protractor-screenshoter-plugin/dev-status.svg)](https://david-dm.org/azachar/protractor-screenshoter-plugin#info=devDependencies)
+[![Known Vulnerabilities](https://snyk.io/package/npm/protractor-screenshoter-plugin/badge.svg)](https://snyk.io/package/npm/protractor-screenshoter-plugin)
 
 [![Build Status](https://travis-ci.org/azachar/protractor-screenshoter-plugin.svg?branch=master)](https://travis-ci.org/azachar/protractor-screenshoter-plugin)
 [![Coverage Status](https://img.shields.io/codecov/c/github/azachar/protractor-screenshoter-plugin.svg?style=flat-square)](http://codecov.io/github/azachar/protractor-screenshoter-plugin?branch=master)
@@ -12,18 +13,26 @@
 
 # protractor-screenshoter-plugin
 
-This plugin captures for each **expectation** or **spec** console **logs** and makes **screenshots** and **raw html snapshots** for **each browser** instance. Also it comes with a beautifull angular based [HTML reporter for chat alike apps](https://github.com/azachar/screenshoter-report-analyzer).
+**It captures screenshots, console logs, raw HTMLs and DB dumps in your e2e protractor tests out-of-box.**
 
-1. This plugin can take screenshots of each Jasmine2 expect success/failure on _multiple-browsers instances_ at once.
-2. It can take screenshots of each spec failure/success as well
-3. For each expectation or spec can capture console logs for each browser instance
-4. It can generate a report analyzer - angular+bootstrap HTML reports with active filtering to easily find out why your tests are failing
-5. HTML reports allow you to analyze your browser's console logs as well.
-6. Supports gitlab.com CI/CD, circleci.com (the report displays a build number, a branch, etc. )
+**All is then visualized in a beautiful [HTML5 report analyzer](https://github.com/azachar/screenshoter-report-analyzer).**
+
+**We support multi capabilities and multi browsers instances, too.**
+
+## Features
+
+1. This plugin can take screenshots of each **Jasmine2** expect **success/failure** on _multiple-browsers instances_ at once.
+2. It can take **screenshots** of each **spec** failure/success as well
+3. For each **expectation** or spec can capture console logs for **each browser instance**
+4. It can generate a report analyzer - angular+bootstrap **HTML reports** with active filtering to easily find out why your tests are failing
+5. HTML reports allow you to analyze your browser's **console logs** as well.
+6. Supports extracting build information (the report displays a build number, a branch, etc. ) for [GitLab](https://gitlab.com) **CI/CD**, [CircleCI](https://circleci.com) and [Travis](https://travis-ci.org/).
 7. Supports parallel tests execution
-8. Makes optional Ascii screenshots
-9. Multi capabilities are supported
-10. For each expectation or spec can capture raw HTML for each browser instance
+8. Makes optional **Ascii** screenshots
+9. **Multi capabilities** are supported
+10. For each expectation or spec can capture **raw HTML** for each browser instance
+11. For each expectation or spec can obtain a **DB dump** via a function returning ``callback(err, dumpAsString)``
+
 
 Additional HTML reporter features:
 
@@ -72,14 +81,16 @@ Also, I created a list of [alternatives](https://github.com/azachar/protractor-s
 If your protractor is installed locally, then
 
 ```
-npm install azachar/protractor-screenshoter-plugin#feat-speech
-npm install say
 sudo apt-get install festival
+npm install say@0.14.0
+npm install azachar/protractor-screenshoter-plugin#feat-speech
 ```
 
 If your protractor is installed globally, then
 ```
-npm install --global protractor-screenshoter-plugin
+sudo apt-get install festival
+npm install --global say@0.14.0
+npm install --global protractor-screenshoter-plugin#feat-speech
 ```
 
 or install this plugin locally, but then you must specify the plugin's path like this:
@@ -117,9 +128,9 @@ as mentioned in #37.
   choco install graphicsmagick
 ```
 
-  Then, install this package
+  Then, install this optional package
 ```sh
-  npm install image-to-ascii
+  npm install image-to-ascii@3.0.11
 ```
 
 
@@ -132,9 +143,9 @@ as mentioned in #37.
   brew install festival
 ```
 
-  Then, install this package
+  Then, install this optional package
 ```sh
-  npm install say
+  npm install say@0.14.0
 ```
 # Experimental features
 
@@ -298,6 +309,24 @@ Before and after each test it reads the name of the test and its result. So you 
   npm install say
 ```
 
+## Environmental variables
+
+Screenshoter out-of-box obtains build information. However, some CI does not have an environmental variable for a commit message. Thus you need to obtain it manually:
+
+**GitLab**
+```sh
+   export CI_COMMIT_MSG=$(git log -1 --pretty=%B)
+```
+
+**CircleCI**
+```sh
+   export CIRCLE_MSG=$(git log -1 --pretty=%B)
+```
+
+If CI will support one day these variables, you won't need to enter anything in your build process.
+
+Do you want to see exactly what is extracted, consult the code directly [obtainCIVariables](index.js#L551)
+
 ## dump
 If set a function, allows you to run extra command that produce a dump. The dump is taken depending on value in [dumpOnSpec](#dumponspec) or [dumpOnExpect](#dumponexpect).
 
@@ -434,7 +463,7 @@ In order to make chrome' console works properly, you need to modify your `protra
 
 ## writeReportFreq
 
-By default, the output JSON file with tests results is written at the end of the execution of jasmine tests. However, for debug, process is better to get it immediately after each expectation - specify the option 'asap'. Also, there is a less usual option to write it after each test - use the option 'spec'. The recommended is to left it out for a CI server and for a local debugging use the option 'asap'.
+By default, the output JSON file with tests results is written at the end of the execution of jasmine tests. However, for debugging, is better to get it written immediately after each expectation - specify the option 'asap'. Also, there is a less usual option to write it after each test - use the option 'spec'. The recommended is to left it out for a CI server and for a local debugging use the option 'asap'.
 
 Default: `'end'`
 
@@ -482,111 +511,4 @@ Please do not specify this flag, if you want all your tests to run through this 
 
 # Development
 
-After cloning the project you can run tests as follows:
-
-1. `npm install`
-2. `npm run setup`
-3. `npm run server &`
-4. `npm test`
-
-To run without coverage report including some debug logging use  `npm run testing`
-
-
-## Committing
-Please use `git-cz` to format your commit message.
-
-Before committing, please check your changes with
-```
-npm run lint
-```
-and fix your code style issues.
-
-## Contributing
-- Your PR is more than welcome!
-- Please include always tests in your PR.
-- If you find a bug, please create a test case for it that fails first, then write your fix. If all passes on Travis, feel free to provide PR.
-
-### How to write tests for your contribution
-
-We are testing our plugin for protractor,
-
-1. so we need an e2e protractor test.
-
-  There are already some e2e tests in ``spec/integrational/protractor`` that can be reused. Basically, we run sample e2e tests against http://www.angularjs.org. So if this page is changed or inaccessible our tests will fail too :(
-
-  ***Note***: *Any PR that will create a local dummy server that our sample tests will run against is welcome :)*
-
-2. Then we need a screenshoter configuration that we will run the protractor e2e tests against. Please write your new config in
-``spec/integrational/protractor-config\bugXXX.js``
-
-3. Please always specify a unique directory for your new screenshoter config, so it doesn't interfere with the existing tests.
-
-  ```js
-  var env = require('../environment');
-
-  exports.config = {
-      seleniumAddress: env.seleniumAddress,
-      framework: 'jasmine2',
-      specs: ['../protractor/angularjs-homepage-test.js'],
-      plugins: [{
-          path: '../../../index.js',
-
-          screenshotPath: '.tmp/bugXXX',
-      }]
-  };
-  ```
-
-4. write your jasmine test (copy the whole describe block from existing one and modify it to your needs).
-
-  Mainly modify
-  ```js
-    beforeAll(function() {
-        runProtractorWithConfig('bugXXX.js');
-    });
-  ```
-
-To check results from protractor e2e tests, simply run
-
-```
-node_modules/protractor/bin/protractor spec/integrational/protractor-config/bugXXX.js
-```
-
-Then you can tweak your jasmine test to check the correct behavior of your screenshoter bugfix or feature.
-
-5. to run jasmine tests use  `npm test` after
-  1. `npm install`
-  2. `npm run setup` This will install webdriver
-  3. `npm run server &` This will run selenium server
-
-### How to debug screenshoter plugin
-
-You can debug this plugin by running protractor in a debug mode like this:
-```
- node --inspect-brk node_modules/protractor/bin/protractor ./spec/integrational/protractor-config/default.js
-```
-**NOTE**
-  Where `./spec/integrational/protractor-config/default.js` is a sample e2e test. You can choose another one or write one yourself.
-
-Then open ``chrome://inspect`` in your Chrome and press `inspect` on the remote target.
-
-Here is more information how to debug protractor - https://github.com/angular/protractor/blob/master/docs/debugging.md
-
-### Releasing
-
-To deploy a new version run commands. If all tests are passed it will be published to npm on its own.
-
-```
-npm run release
-git push --follow-tags origin master
-```
-
-## TODO
-- Use promises instead of callbacks
-   - Refactor `asap/spec/end` report writing at the end of each promise.all, instead of after each callback
-- Get rid of workaround for long-running operations
-   - Make a command line tool to collect particular json reports and to combine them into to the final `report.js` to avoid race conditions with multi snapshots/protractor/browsers instances writing to the same `report.js` or reading from unfinished particular report json to produce `report.js`.
-- Refactor data structure of `report.js` (breaking change)
-   - Get rid of spec and expect duality (needs to be refactored the reporter plugin too)
-- 100% Test coverage
-- Convert to typescript based es6 npm plugin with a proper test infrastructure
-- Support Mocha framework
+Please follow [CONTRIBUTING.md](https://github.com/azachar/protractor-screenshoter-plugin/blob/master/CONTRIBUTING.md).
